@@ -81,6 +81,6 @@ void GScriptServer::onStartInstall(const QByteArray &data)
 void GScriptServer::onExit(const QByteArray &data)
 {
     Q_UNUSED(data);
-    emit sigExitServer();
+    //emit sigExitServer();
 }
 

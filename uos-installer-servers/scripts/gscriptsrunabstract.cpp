@@ -13,7 +13,7 @@ void GScriptsRunAbstract::startRun(const QString &cmd, const QStringList &args)
 {
     m_command = cmd;
     m_args = args;
-    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this, 100000));
+    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this, 2000000));
 }
 
 void GScriptsRunAbstract::runCommand()
