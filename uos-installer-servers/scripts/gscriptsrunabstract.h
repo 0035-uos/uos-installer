@@ -13,7 +13,9 @@ class GScriptsRunAbstract : public QObject
 public:
     explicit GScriptsRunAbstract(QObject *parent = nullptr);
 
+    void waitFinished();
 signals:
+    void finished();
 
 public slots:
     void startRun(const QString& cmd, const QStringList &args);

@@ -10,6 +10,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QFileInfo>
 
 GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_script(new GScriptsRunAbstract)
@@ -76,6 +77,7 @@ void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
     m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+    m_script->waitFinished();
 }
 
 void GScriptServer::onExit(const QByteArray &data)

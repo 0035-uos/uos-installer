@@ -9,6 +9,11 @@ GScriptsRunAbstract::GScriptsRunAbstract(QObject *parent) :
 {
 }
 
+void GScriptsRunAbstract::waitFinished()
+{
+    m_future.get();
+}
+
 void GScriptsRunAbstract::startRun(const QString &cmd, const QStringList &args)
 {
     m_command = cmd;
@@ -46,6 +51,7 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     process->waitForStarted(3000);
     process->waitForFinished(timeout);
     qInfo() << "finished";
+    emit finished();
     return 0;
 }
 

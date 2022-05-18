@@ -10,6 +10,8 @@
 #include "gsysinfo.h"
 
 #include <QDebug>
+#include <QDir>
+#include <QFileInfo>
 
 int main(int argc, char *argv[])
 {
@@ -54,6 +56,15 @@ int main(int argc, char *argv[])
     sys.commitData();
     sys.exportfile("./sysinfo.json");
     /// 同分区参数
+
+    QDir dir("/installer");
+    if (!(dir.exists())) {
+        QDir("/").mkdir("/installer");
+    }
+    if (!(dir.exists())) {
+        qWarning() << "/installer create failed";
+        return 0;
+    }
 
 
     CommunicationInterface *socket = GLocalManager::Instance()->communication();
