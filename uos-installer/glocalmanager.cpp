@@ -48,7 +48,7 @@ void GLocalManager::startInstall()
     m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo("./parted.json")));
     m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("sysinfo.json")));
     m_flowList.append(GProtocol::startInstallFrame());
-    m_flowList.append(GProtocol::exitServerFrame());
+    //m_flowList.append(GProtocol::exitServerFrame());
     next();
 }
 

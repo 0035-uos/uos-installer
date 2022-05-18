@@ -75,7 +75,7 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    m_script->startRun("main.sh", QStringList()<<"squashfs_path" << "/dev/sdb");
+    m_script->startRun("/test/main.sh", QStringList()<<"/home/cml/filesystem.squashfs" << "/dev/sdb");
 }
 
 void GScriptServer::onExit(const QByteArray &data)

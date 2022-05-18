@@ -13,7 +13,7 @@ void GScriptsRunAbstract::startRun(const QString &cmd, const QStringList &args)
 {
     m_command = cmd;
     m_args = args;
-    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this, 10000));
+    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this, 100000));
 }
 
 void GScriptsRunAbstract::runCommand()
@@ -31,6 +31,15 @@ int GScriptsRunAbstract::asyncThread(int timeout)
         if (!an.isEmpty())
             qInfo() << an;
         process->deleteLater();
+    });
+    connect(process, &QProcess::started, this, []{
+        qInfo() << "start install";
+    });
+    connect(process, &QProcess::readyReadStandardOutput, this, [process]{
+        qWarning() << process->readAllStandardOutput();
+    });
+    connect(process, &QProcess::readChannelMode, this, [process]{
+        qWarning() << process->readAllStandardError();
     });
     process->start(m_command, m_args);
 
