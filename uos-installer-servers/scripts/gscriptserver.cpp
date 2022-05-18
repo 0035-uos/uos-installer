@@ -48,7 +48,7 @@ void GScriptServer::onGetDevices(const QByteArray &data)
 
 void GScriptServer::onSetParted(const QByteArray &data)
 {
-    qInfo() << __func__ << data; // 分区信息 data->json
+    qInfo() << __func__; // 分区信息 data->json
     // 保存路径可以先固定，后期统一配置
     QString fp = Tools::parted_parameter_path;
     QFile file(fp);
@@ -61,7 +61,7 @@ void GScriptServer::onSetParted(const QByteArray &data)
 
 void GScriptServer::onSetSysInfo(const QByteArray &data)
 {
-    qInfo() << __func__ << data;
+    qInfo() << __func__;
     // 保存路径可以先固定，后期统一配置
     QString fp = Tools::parted_sys_info_path;
     QFile file(fp);
@@ -75,7 +75,7 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    m_script->startRun("/test/main.sh", QStringList()<<"/home/cml/filesystem.squashfs" << "/dev/sdb");
+    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
 }
 
 void GScriptServer::onExit(const QByteArray &data)

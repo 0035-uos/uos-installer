@@ -38,13 +38,14 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     connect(process, &QProcess::readyReadStandardOutput, this, [process]{
         qWarning() << process->readAllStandardOutput();
     });
-    connect(process, &QProcess::readChannelMode, this, [process]{
+    connect(process, &QProcess::readyReadStandardError, this, [process]{
         qWarning() << process->readAllStandardError();
     });
     process->start(m_command, m_args);
 
     process->waitForStarted(3000);
     process->waitForFinished(timeout);
+    qInfo() << "finished";
     return 0;
 }
 

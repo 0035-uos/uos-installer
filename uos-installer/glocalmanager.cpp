@@ -46,9 +46,9 @@ void GLocalManager::startInstall()
     }
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo("./parted.json")));
-    m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("sysinfo.json")));
+    m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./sysinfo.json")));
     m_flowList.append(GProtocol::startInstallFrame());
-    //m_flowList.append(GProtocol::exitServerFrame());
+    m_flowList.append(GProtocol::exitServerFrame());
     next();
 }
 
@@ -60,7 +60,7 @@ void GLocalManager::recvData(const QByteArray &data)
 
 void GLocalManager::next()
 {
-    if (!m_inter) return;
+    if (!m_inter || m_flowList.length() <= 0) return;
     QByteArray top = m_flowList.front();
     m_flowList.removeFirst();
     m_inter->send(top);
