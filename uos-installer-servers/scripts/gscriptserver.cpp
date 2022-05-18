@@ -50,30 +50,32 @@ void GScriptServer::onSetParted(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 分区信息 data->json
     // 保存路径可以先固定，后期统一配置
-    QString fp = "/tmp/parted.json";
+    QString fp = Tools::parted_parameter_path;
     QFile file(fp);
     if (file.open(QFile::WriteOnly)) {
         file.write(QJsonDocument::fromJson(data).toJson(QJsonDocument::Indented));
         file.close();
     }
+    // undo check
 }
 
 void GScriptServer::onSetSysInfo(const QByteArray &data)
 {
     qInfo() << __func__ << data;
     // 保存路径可以先固定，后期统一配置
-    QString fp = "/tmp/sysinfo.json";
+    QString fp = Tools::parted_sys_info_path;
     QFile file(fp);
     if (file.open(QFile::WriteOnly)) {
         file.write(QJsonDocument::fromJson(data).toJson(QJsonDocument::Indented));
         file.close();
     }
+    // undo check
 }
 
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    // m_script->startRun("ls", QStringList()<<"/usr/share");
+    m_script->startRun("main.sh", QStringList()<<"squashfs_path" << "/dev/sdb");
 }
 
 void GScriptServer::onExit(const QByteArray &data)

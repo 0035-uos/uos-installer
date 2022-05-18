@@ -21,7 +21,7 @@ public slots:
 private slots:
     void runCommand();
 private:
-    int asyncThread();
+    int asyncThread(int timeout);
     void runScripts();
     void run();
 private:

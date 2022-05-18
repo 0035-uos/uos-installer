@@ -13,16 +13,16 @@ void GScriptsRunAbstract::startRun(const QString &cmd, const QStringList &args)
 {
     m_command = cmd;
     m_args = args;
-    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this));
+    m_future = std::async(std::launch::async, std::bind(&GScriptsRunAbstract::asyncThread, this, 10000));
 }
 
 void GScriptsRunAbstract::runCommand()
 {
 }
 
-int GScriptsRunAbstract::asyncThread()
+int GScriptsRunAbstract::asyncThread(int timeout)
 {
-    qInfo() << m_command << m_args;
+    qInfo() << m_command << m_args << timeout;
     m_quit = false;
     QProcess *process = new QProcess;
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
@@ -35,7 +35,7 @@ int GScriptsRunAbstract::asyncThread()
     process->start(m_command, m_args);
 
     process->waitForStarted(3000);
-    process->waitForFinished(2000);
+    process->waitForFinished(timeout);
     return 0;
 }
 

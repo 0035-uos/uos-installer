@@ -3,10 +3,6 @@
 
 #include "communication/communicationinterface.h"
 
-
-#include <QObject>
-#include <QList>
-
 class QLocalServer;
 class QLocalSocket;
 class GLocalSocket : public CommunicationInterface
