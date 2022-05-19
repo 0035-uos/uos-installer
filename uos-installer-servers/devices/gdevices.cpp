@@ -4,27 +4,95 @@
 
 #include <parted/parted.h>
 
+DeviceInfo::DeviceInfo(QObject *parent) : PropertyReflection(parent)
+{
+}
+
+
+QString DeviceInfo::getPath() const
+{
+    return path;
+}
+
+void DeviceInfo::setPath(const QString &value)
+{
+    path = value;
+}
+
+qint64 DeviceInfo::getSectorSize() const
+{
+    return sectorSize;
+}
+
+void DeviceInfo::setSectorSize(qint64 value)
+{
+    sectorSize = value;
+}
+
+qint64 DeviceInfo::getPhysSectorSize() const
+{
+    return physSectorSize;
+}
+
+void DeviceInfo::setPhysSectorSize(qint64 value)
+{
+    physSectorSize = value;
+}
+
+qint64 DeviceInfo::getLength() const
+{
+    return length;
+}
+
+void DeviceInfo::setLength(qint64 value)
+{
+    length = value;
+}
+
+int DeviceInfo::getType() const
+{
+    return type;
+}
+
+void DeviceInfo::setType(int value)
+{
+    type = value;
+}
+
+
+
 GDevices::GDevices(QObject *parent) : QObject(parent)
 {
     scanDevices();
 }
 
-const QList<DeviceInfo> &GDevices::Devices()
+const QList<DeviceInfo*> &GDevices::Devices()
 {
     return m_devices;
+}
+
+QJsonArray GDevices::DevicesJson() const
+{
+    QJsonArray array;
+    for (const DeviceInfo* info : m_devices) {
+        array.append(info->properyToJson());
+    }
+    return array;
 }
 
 void GDevices::scanDevices()
 {
     PedDevice* pDevice = nullptr;
-    ped_device_probe_all();
+    ped_device_probe_all();;
     while ((pDevice = ped_device_get_next(pDevice))) {
-       DeviceInfo info;
-       info.path = pDevice->path;
-       info.sector_size = pDevice->sector_size;
-       info.phys_sector_size = pDevice->phys_sector_size;
-       info.length = pDevice->length;
-       info.type = int(pDevice->type);
+       DeviceInfo *info = new DeviceInfo;
+       info->setPath(pDevice->path);
+       info->setSectorSize(pDevice->sector_size);
+       info->setPhysSectorSize(pDevice->phys_sector_size);
+       info->setLength(pDevice->length);
+       info->setType(int(pDevice->type));
        m_devices.append(info);
     }
 }
+
+

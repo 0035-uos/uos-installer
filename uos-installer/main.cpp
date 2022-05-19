@@ -19,7 +19,8 @@ int main(int argc, char *argv[])
 
     a.setObjectName("uos-installer");
 
-    /// eg
+#if 0
+    /// eg  示例程序，后期删除
     /// 生成分区参数文件示例
     GPartedInfo parted;
     {
@@ -56,15 +57,16 @@ int main(int argc, char *argv[])
     sys.commitData();
     sys.exportfile("./sysinfo.json");
     /// 同分区参数
+#endif
 
-    QDir dir("/installer");
-    if (!(dir.exists())) {
-        QDir("/").mkdir("/installer");
-    }
-    if (!(dir.exists())) {
-        qWarning() << "/installer create failed";
-        return 0;
-    }
+//    QDir dir("/installer");
+//    if (!(dir.exists())) {
+//        QDir("/").mkdir("/installer");
+//    }
+//    if (!(dir.exists())) {
+//        qWarning() << "/installer create failed";
+//        return 0;
+//    }
 
 
     CommunicationInterface *socket = GLocalManager::Instance()->communication();

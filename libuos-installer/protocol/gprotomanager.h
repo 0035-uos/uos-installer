@@ -17,11 +17,7 @@ class GProtoManager : public QObject, public Singleton<GProtoManager>
 public:
     explicit GProtoManager(QObject *parent = nullptr);
 
-//    void appendPartedItem(GPartedItem* item);
-//    void removeAllPartedItem();
-
 public slots:
-//    bool savePartedInfoToFile(const QString& filename);
     void appendSocketData(const QByteArray& data);
 signals:
     void newFrame(const QByteArray& type, const QByteArray& frame);

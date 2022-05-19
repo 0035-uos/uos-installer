@@ -4,6 +4,8 @@
 #include "protocol/gprotocol.h"
 #include "utils/commands.h"
 #include "utils/utils.h"
+#include "gnotifyinfo.h"
+#include "devices/gdevices.h"
 
 #include <QtDebug>
 #include <QFile>
@@ -24,27 +26,19 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
 
 void GScriptServer::start(const QByteArray &cmd, const QByteArray &parameter)
 {
-    //qInfo() << cmd << parameter;
     if (m_registerFunction.contains(cmd)) {
         m_registerFunction.value(cmd)(parameter);
     }
-
-    QString fn = Tools::scanValidFileName("/tmp/", "uos-install-tmp");
-    QFile file(fn);
-    if (!file.open(QFile::WriteOnly)) {
-        return;
-    }
-    file.write(parameter);
-    file.close();
-    QByteArray send;
-    GProtocol::getFrameFromFile(fn, send);
-    sigSend(send);
-    //m_script->startRun("ls", QStringList()<<"/usr/share");
 }
 
 void GScriptServer::onGetDevices(const QByteArray &data)
 {
     qInfo() << __func__ << data;// undo
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_get_devices, true, "desc"); // undo 判断设备读取情况
+    info.appendItem("devices", GDevices::Instance()->DevicesJson());
+
+    info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
 void GScriptServer::onSetParted(const QByteArray &data)
@@ -58,6 +52,9 @@ void GScriptServer::onSetParted(const QByteArray &data)
         file.close();
     }
     // undo check
+
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_parted, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
 void GScriptServer::onSetSysInfo(const QByteArray &data)
@@ -71,18 +68,26 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
         file.close();
     }
     // undo check
+
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_sys_info, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+    m_script->startRun("/bin/bash", QStringList()<< "/home/deepin/main.sh"/*"/test/main.sh"*/ <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+
+    GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info1.data()));
     m_script->waitFinished();
+    GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info2.data()));
 }
 
 void GScriptServer::onExit(const QByteArray &data)
 {
     Q_UNUSED(data);
-    //emit sigExitServer();
+    emit sigExitServer();
 }
 

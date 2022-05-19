@@ -2,10 +2,12 @@
 #define GDEVICES_H
 
 #include "utils/singleton.h"
+#include "utils/propertyreflection.h"
 
 #include <QObject>
 #include <QList>
-
+#include <QJsonArray>
+#include <QJsonObject>
 /*
 typedef enum {
         PED_DEVICE_UNKNOWN      = 0,
@@ -30,14 +32,32 @@ typedef enum {
         PED_DEVICE_NVME         = 19
 } PedDeviceType;
 */
-struct DeviceInfo
+class DeviceInfo : public PropertyReflection
 {
-    QString path;
-    long long       sector_size;            /**< logical sector size */
-    long long       phys_sector_size;       /**< physical sector size */
-    long long       length;                 /**< device length (LBA) */
+    Q_OBJECT
+    Q_PROPERTY(QString path READ getPath WRITE setPath)
+    Q_PROPERTY(qint64 sectorSize READ getSectorSize WRITE setSectorSize)
+    Q_PROPERTY(qint64 physSectorSize READ getPhysSectorSize WRITE setPhysSectorSize)
+    Q_PROPERTY(qint64 length READ getLength WRITE setLength)
+    Q_PROPERTY(int type READ getType WRITE setType)
+
+    QString     path;
+    qint64      sectorSize;            /**< logical sector size */
+    qint64      physSectorSize;       /**< physical sector size */
+    qint64      length;                 /**< device length (LBA) */
     int type;
-    // undo ...
+public:
+    explicit DeviceInfo(QObject* parent = nullptr);
+    QString getPath() const;
+    void setPath(const QString &value);
+    qint64 getSectorSize() const;
+    void setSectorSize(qint64 value);
+    qint64 getPhysSectorSize() const;
+    void setPhysSectorSize(qint64 value);
+    qint64 getLength() const;
+    void setLength(qint64 value);
+    int getType() const;
+    void setType(int value);
 };
 
 class GDevices : public QObject, public Singleton<GDevices>
@@ -46,8 +66,8 @@ class GDevices : public QObject, public Singleton<GDevices>
 public:
     explicit GDevices(QObject *parent = nullptr);
 
-    const QList<DeviceInfo> &Devices();
-
+    const QList<DeviceInfo *> &Devices();
+    QJsonArray DevicesJson() const;
 signals:
 
 public slots:
@@ -56,7 +76,7 @@ private:
     void scanDevices();
 
 private:
-    QList<DeviceInfo> m_devices;
+    QList<DeviceInfo*> m_devices;
 };
 
 #endif // GDEVICES_H

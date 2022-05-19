@@ -3,8 +3,11 @@
 #include "utils/utils.h"
 #include "localsocket.h"
 #include "protocol/gprotocol.h"
+#include "protocol/gprotomanager.h"
 #include "gpartedinfo.h"
 #include "gsysinfo.h"
+#include "utils/commands.h"
+#include "gnotifyinfo.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -13,7 +16,7 @@
 GLocalManager::GLocalManager(QObject *parent) : QObject(parent),
     m_inter(nullptr)
 {
-
+    connect(GProtoManager::Instance(), &GProtoManager::newFrame, this, &GLocalManager::recvData);
 }
 
 CommunicationInterface *GLocalManager::communication()
@@ -35,7 +38,9 @@ CommunicationInterface *GLocalManager::communication()
         m_inter = new LocalSocket;
     }
     m_inter->setObjectName(qApp->objectName());
-    connect(m_inter, &CommunicationInterface::sigRecvData, this, &GLocalManager::recvData);
+    connect(m_inter, &CommunicationInterface::sigRecvData, this, [&](const QByteArray &data){
+        GProtoManager::Instance()->appendSocketData(data);
+    });
     return m_inter;
 }
 
@@ -48,13 +53,31 @@ void GLocalManager::startInstall()
     m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo("./parted.json")));
     m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./sysinfo.json")));
     m_flowList.append(GProtocol::startInstallFrame());
-    m_flowList.append(GProtocol::exitServerFrame());
     next();
 }
 
-void GLocalManager::recvData(const QByteArray &data)
+void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
 {
-    Q_UNUSED(data);
+    GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
+    info.commitData();
+    QString cmd = info.object().value("result").toObject().value("command").toString();
+    qInfo() << cmd;
+    if (cmd == cmd_notify_install_result) {
+        m_inter->send(GProtocol::exitServerFrame());
+        QTimer::singleShot(2000, this, []{
+            qApp->exit();
+        });
+        return;
+    }
+//    if (cmd == cmd_get_devices) {
+//        QFile file("./dev.json");
+//        if (file.open(QFile::WriteOnly)) {
+//            file.write(info.data());
+//            file.close();
+//        }
+//    } else {
+//        qInfo() << frame;
+//    }
     next();
 }
 
@@ -64,9 +87,4 @@ void GLocalManager::next()
     QByteArray top = m_flowList.front();
     m_flowList.removeFirst();
     m_inter->send(top);
-    if (m_flowList.length() == 0) {
-        QTimer::singleShot(2000, this, []{
-            qApp->exit();
-        });
-    }
 }

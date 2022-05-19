@@ -20,10 +20,12 @@ signals:
 public slots:
 
 public:
+    static QByteArray generateFrame(const QByteArray& cmd, const QByteArray& data);
     static QByteArray getDevicesFrame();
     static QByteArray getPartedFrame(GJson *json);
     static QByteArray getSysInfoFrame(GJson* json);
     static QByteArray startInstallFrame();
+    static QByteArray getNotifyFrame(const QByteArray& data);
 
     static QByteArray exitServerFrame();
 };

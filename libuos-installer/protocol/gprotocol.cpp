@@ -40,15 +40,9 @@ int GProtocol::getFrameFromFile(const QString &filename, QByteArray &frame)
     if (!file.open(QFile::ReadOnly)) {
         return 1;
     }
-    frame.append(proto_begin);
-    frame.append(type_begin);
-    frame.append(type_file);
-    frame.append(type_end);
-    frame.append(content_begin);
-    frame.append(file.readAll());
-    frame.append(content_end);
-    frame.append(proto_end);
+    QByteArray tmp = file.readAll();
     file.close();
+    frame = generateFrame(type_file, tmp);
     return 0;
 }
 
@@ -59,72 +53,46 @@ int GProtocol::getFrameFromCmd(const QByteArray &cmd, QByteArray &frame)
     return 0;
 }
 
-QByteArray GProtocol::getDevicesFrame()
+QByteArray GProtocol::generateFrame(const QByteArray &cmd, const QByteArray &data)
 {
     QByteArray frame;
     frame.append(proto_begin);
     frame.append(type_begin);
-    frame.append(cmd_get_devices);
+    frame.append(cmd);
     frame.append(type_end);
     frame.append(content_begin);
-    frame.append("1");
+    frame.append(data);
     frame.append(content_end);
     frame.append(proto_end);
     return frame;
+}
+
+QByteArray GProtocol::getDevicesFrame()
+{
+    return generateFrame(cmd_get_devices, "devices");
 }
 
 QByteArray GProtocol::getPartedFrame(GJson* json)
 {
-    QByteArray frame;
-    frame.append(proto_begin);
-    frame.append(type_begin);
-    frame.append(cmd_set_parted);
-    frame.append(type_end);
-    frame.append(content_begin);
-    frame.append(json->data());
-    frame.append(content_end);
-    frame.append(proto_end);
-    return frame;
+    return generateFrame(cmd_set_parted, json->data());
 }
 
 QByteArray GProtocol::getSysInfoFrame(GJson *json)
 {
-    QByteArray frame;
-    frame.append(proto_begin);
-    frame.append(type_begin);
-    frame.append(cmd_set_sys_info);
-    frame.append(type_end);
-    frame.append(content_begin);
-    frame.append(json->data());
-    frame.append(content_end);
-    frame.append(proto_end);
-    return frame;
+    return generateFrame(cmd_set_sys_info, json->data());
 }
 
 QByteArray GProtocol::startInstallFrame()
 {
-    QByteArray frame;
-    frame.append(proto_begin);
-    frame.append(type_begin);
-    frame.append(cmd_start_install);
-    frame.append(type_end);
-    frame.append(content_begin);
-    frame.append("3");
-    frame.append(content_end);
-    frame.append(proto_end);
-    return frame;
+    return generateFrame(cmd_start_install, "startInstall");
+}
+
+QByteArray GProtocol::getNotifyFrame(const QByteArray &data)
+{
+    return  generateFrame(cmd_notify_response, data);
 }
 
 QByteArray GProtocol::exitServerFrame()
 {
-    QByteArray frame;
-    frame.append(proto_begin);
-    frame.append(type_begin);
-    frame.append(cmd_exit_server);
-    frame.append(type_end);
-    frame.append(content_begin);
-    frame.append("4");
-    frame.append(content_end);
-    frame.append(proto_end);
-    return frame;
+    return  generateFrame(cmd_exit_server, "exit");
 }

@@ -36,7 +36,8 @@ SOURCES += \
     gjsonitem.cpp \
     communication/localinterface.cpp \
     communication/communicationinterface.cpp \
-    protocol/gprotomanager.cpp
+    protocol/gprotomanager.cpp \
+    utils/propertyreflection.cpp
 
 
 HEADERS += \
@@ -54,7 +55,8 @@ HEADERS += \
     gjsonitem.h \
     communication/localinterface.h \
     communication/communicationinterface.h \
-    protocol/gprotomanager.h
+    protocol/gprotomanager.h \
+    utils/propertyreflection.h
 
 unix {
     target.path = /usr/lib

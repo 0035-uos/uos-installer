@@ -22,4 +22,8 @@ static const QByteArray cmd_stop_install("CMD_STOP_INSTALL");
 static const QByteArray cmd_info_progress("CMD_INFO_PROGRESS");
 static const QByteArray cmd_exit_server("CMD_EXIT_SERVER");
 
+
+static const QByteArray cmd_notify_response("CMD_NOTIFY_RESPONSE");
+static const QByteArray cmd_notify_install_result("CMD_NOTIFY_INSTALL_RESULT");
+
 #endif // COMMANDS_H

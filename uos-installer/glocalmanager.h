@@ -17,7 +17,7 @@ public:
     void startInstall();
 
 public slots:
-    void recvData(const QByteArray& data);
+    void recvData(const QByteArray& type, const QByteArray& frame);
     void next();
 
 private:
