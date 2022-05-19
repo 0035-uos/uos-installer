@@ -14,6 +14,7 @@ class GJson
 {
 public:
     explicit GJson(const QString &filename = QString());
+    explicit GJson(const QByteArray& data);
     virtual ~GJson();
 
     virtual QByteArray data() const;

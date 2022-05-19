@@ -21,6 +21,7 @@ static const QByteArray cmd_start_install("CMD_START_INSTALL");
 static const QByteArray cmd_stop_install("CMD_STOP_INSTALL");
 static const QByteArray cmd_info_progress("CMD_INFO_PROGRESS");
 static const QByteArray cmd_exit_server("CMD_EXIT_SERVER");
+static const QByteArray cmd_set_component("CMD_SET_COMPONENT");
 
 
 static const QByteArray cmd_notify_response("CMD_NOTIFY_RESPONSE");

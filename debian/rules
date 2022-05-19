@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+export QT_SELECT=5
+include /usr/share/dpkg/default.mk
+
+DEB_BUILD_ARCH ?= $(shell dpkg-architecture -qDEB_BUILD_ARCH)
+
+SYSTYPE = $(shell cat /usr/lib/deepin/desktop-version | grep Type= | awk -F'=' '{print $$2}')
+
+%:
+	dh $@ --parallel

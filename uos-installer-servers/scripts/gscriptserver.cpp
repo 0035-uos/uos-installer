@@ -22,6 +22,7 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_registerFunction[cmd_set_sys_info] = std::bind(&GScriptServer::onSetSysInfo, this, std::placeholders::_1);
     m_registerFunction[cmd_start_install] = std::bind(&GScriptServer::onStartInstall, this, std::placeholders::_1);
     m_registerFunction[cmd_exit_server] = std::bind(&GScriptServer::onExit, this, std::placeholders::_1);
+    m_registerFunction[cmd_set_component] = std::bind(&GScriptServer::onSetComponent, this, std::placeholders::_1);
 }
 
 void GScriptServer::start(const QByteArray &cmd, const QByteArray &parameter)
@@ -46,10 +47,10 @@ void GScriptServer::onSetParted(const QByteArray &data)
     qInfo() << __func__; // 分区信息 data->json
     // 保存路径可以先固定，后期统一配置
     QString fp = Tools::parted_parameter_path;
-    QFile file(fp);
-    if (file.open(QFile::WriteOnly)) {
-        file.write(QJsonDocument::fromJson(data).toJson(QJsonDocument::Indented));
-        file.close();
+    if (GJson(data).exportfile(fp)) {
+        qInfo() << "save parted(json):" << fp;
+    } else {
+        qWarning() << "save partd(json) failed:" << fp;
     }
     // undo check
 
@@ -61,11 +62,11 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
 {
     qInfo() << __func__;
     // 保存路径可以先固定，后期统一配置
-    QString fp = Tools::parted_sys_info_path;
-    QFile file(fp);
-    if (file.open(QFile::WriteOnly)) {
-        file.write(QJsonDocument::fromJson(data).toJson(QJsonDocument::Indented));
-        file.close();
+    QString fp = Tools::sys_info_path;
+    if (GJson(data).exportfile(fp)) {
+        qInfo() << "save sysinfo(json):" << fp;
+    } else {
+        qWarning() << "save sysinfo(json) failed:" << fp;
     }
     // undo check
 
@@ -73,10 +74,26 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
     sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
+
+void GScriptServer::onSetComponent(const QByteArray &data)
+{
+    qInfo() << __func__;
+    QString fp = Tools::component_path;
+    if (GJson(data).exportfile(fp)) {
+        qInfo() << "save sysinfo(json):" << fp;
+    } else {
+        qWarning() << "save sysinfo(json) failed:" << fp;
+    }
+    // undo check
+
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_component, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    m_script->startRun("/bin/bash", QStringList()<< "/home/deepin/main.sh"/*"/test/main.sh"*/ <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
 
     GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info1.data()));
@@ -84,6 +101,7 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info2.data()));
 }
+
 
 void GScriptServer::onExit(const QByteArray &data)
 {

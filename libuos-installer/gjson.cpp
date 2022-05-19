@@ -7,6 +7,12 @@ GJson::GJson(const QString &filename)
         loadfile(filename);
 }
 
+GJson::GJson(const QByteArray &data):
+    m_doc(QJsonDocument::fromJson(data))
+{
+
+}
+
 GJson::~GJson()
 {
 }

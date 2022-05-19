@@ -1,0 +1,29 @@
+Source: uos-installer
+Maintainer: uos <uos@uniontech.com>
+Section: devel utils
+Priority: optional
+Standards-Version: 0.0.1
+
+Package: pxe-tools
+Architecture: any
+Section: devel
+Priority: optional
+Build-Depends:
+  debhelper (>=9)
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ ${dist:Depends},
+ libqt5widgets5,
+ libqt5gui5,
+ libqt5network5,
+ libqt5core5a,
+ libgl1,
+ libc6,
+ libstdc++6,
+ libgcc1,
+ python3-apt
+Description: A pxe tool for pxe environment configure
+
+
+
