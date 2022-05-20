@@ -18,13 +18,13 @@ void GNotifyItem::setDescribe(const QString &desc)
 
 
 GNotifyInfo::GNotifyInfo() :
-    GJson ("")
+    GJson ()
 {
 
 }
 
 GNotifyInfo::GNotifyInfo(const QJsonObject &info) :
-    GJson (""), m_info(info)
+    GJson (), m_info(info)
 {
 
 }

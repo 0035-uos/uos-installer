@@ -1,6 +1,8 @@
 #ifndef GPROTOCOL_H
 #define GPROTOCOL_H
 
+#include "serverstate.h"
+
 #include <QObject>
 
 class GJson;

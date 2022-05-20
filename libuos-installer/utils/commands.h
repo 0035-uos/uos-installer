@@ -14,6 +14,8 @@ static const int min_len = proto_begin.length()+proto_end.length()+type_begin.le
 static const QByteArray type_file("FILE");
 static const QByteArray type_cmd("CMD");
 
+static const QByteArray heartbeat_packets("HEARTBEAT_PACKETS");
+
 static const QByteArray cmd_get_devices("CMD_GET_DEVICES");
 static const QByteArray cmd_set_parted("CMD_SET_PARTED");
 static const QByteArray cmd_set_sys_info("CMD_SET_SYS_INFO");
@@ -26,5 +28,7 @@ static const QByteArray cmd_set_component("CMD_SET_COMPONENT");
 
 static const QByteArray cmd_notify_response("CMD_NOTIFY_RESPONSE");
 static const QByteArray cmd_notify_install_result("CMD_NOTIFY_INSTALL_RESULT");
+
+
 
 #endif // COMMANDS_H

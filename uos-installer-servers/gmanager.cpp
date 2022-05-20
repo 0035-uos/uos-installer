@@ -3,9 +3,11 @@
 #include "communication/gcommserver.h"
 #include "scripts/gscriptserver.h"
 #include "protocol/gprotomanager.h"
+#include "gheartbeatthread.h"
 
 #include <QThread>
 #include <QDebug>
+#include <QTimer>
 #include <QCoreApplication>
 
 GManager::GManager(QObject *parent) : QObject(parent)
@@ -20,10 +22,17 @@ void GManager::init()
 {
     initCommunication();
     initInstaller();
+
+    connect(GHeartBeatThread::Instance(), &GHeartBeatThread::sigSend, this, &GManager::sendData);
+    appendJob("heartbeat", GHeartBeatThread::Instance());
+    QTimer::singleShot(200, this, []{
+        GHeartBeatThread::Instance()->sigStartHeartBeat(2000);
+    });
 }
 
 void GManager::onExitServer()
 {
+    GHeartBeatThread::Instance()->setExit(true);
     QMap<QString, JobItem>::const_iterator it = m_jobMap.constBegin();
     for (; it != m_jobMap.constEnd(); it++) {
         qInfo() << "waiting" << it.key() << "exit";

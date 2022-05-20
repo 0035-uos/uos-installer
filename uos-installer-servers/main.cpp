@@ -1,7 +1,6 @@
 #include <QCoreApplication>
 
 #include "scripts/gscriptsrunabstract.h"
-
 #include "protocol/gprotomanager.h"
 #include "gmanager.h"
 
@@ -13,6 +12,8 @@ int main(int argc, char *argv[])
     GManager manager;
     manager.init();
     manager.sigStartCommunication();
+
+
 
     return a.exec();
 }

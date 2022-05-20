@@ -34,7 +34,7 @@ void GProtoManager::parseDataFrame()
             break;
         default:
             qInfo() << ret << frame;
-            continue;
+            return;
         }
         ret = GProtocol::getDataFromFrame(type_begin, type_end, frame, type);
 

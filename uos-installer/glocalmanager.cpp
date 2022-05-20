@@ -52,12 +52,18 @@ void GLocalManager::startInstall()
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo("./parted.json")));
     m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./sysinfo.json")));
+    m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./component.list")));
     m_flowList.append(GProtocol::startInstallFrame());
     next();
 }
 
 void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
 {
+    Q_UNUSED(type)
+    if (type == heartbeat_packets) {
+        qInfo() << type;
+        return;
+    }
     GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
     info.commitData();
     QString cmd = info.object().value("result").toObject().value("command").toString();

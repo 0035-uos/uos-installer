@@ -22,9 +22,9 @@ public:
     virtual bool exportfile(const QString& filename) const;
     virtual bool commitData();
 
-protected:
-    bool commitData(const QJsonArray& array);
-    bool commitData(const QJsonObject& object);
+public:
+    virtual bool commitData(const QJsonArray& array);
+    virtual bool commitData(const QJsonObject& object);
 protected:
     QJsonDocument m_doc;
 

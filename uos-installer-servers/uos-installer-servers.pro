@@ -19,7 +19,8 @@ SOURCES += \
     devices/gdevices.cpp \
     devices/gparted.cpp \
     communication/gserialport.cpp \
-    communication/gnetscoket.cpp
+    communication/gnetscoket.cpp \
+    gheartbeatthread.cpp
 
 
 HEADERS += \
@@ -33,7 +34,8 @@ HEADERS += \
     devices/gdevices.h \
     devices/gparted.h \
     communication/gserialport.h \
-    communication/gnetscoket.h
+    communication/gnetscoket.h \
+    gheartbeatthread.h
 
 
 # Default rules for deployment.
