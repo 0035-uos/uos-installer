@@ -8,6 +8,7 @@
 #include "gpartedinfo.h"
 #include "gparteditem.h"
 #include "gsysinfo.h"
+#include "log/DLog"
 
 #include <QDebug>
 #include <QDir>
@@ -18,6 +19,17 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     a.setObjectName("uos-installer");
+
+#ifndef QT_DEBUG
+    QString log_file(QString("%1/.cache/deepin/deepin-pxe-tools.log").arg(getenv("HOME")));
+#else
+    QString log_file("/tmp/uos-installer.log");
+#endif
+    DLogManager::setLogFormat("%{time}{yyyy-MM-dd, HH:mm:ss.zzz} [%{type:-7}] "
+                              "[%{function:-35} %{line}] %{message}\n");
+    DLogManager::setlogFilePath(log_file);
+    DLogManager::registerConsoleAppender();
+    DLogManager::registerFileAppender();
 
 #if 0
     /// eg  示例程序，后期删除
