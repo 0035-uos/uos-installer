@@ -4,6 +4,9 @@
 #include "scripts/gscriptserver.h"
 #include "protocol/gprotomanager.h"
 #include "gheartbeatthread.h"
+#include "gcomponentmanager.h"
+#include "utils/utils.h"
+#include "protocol/serverstate.h"
 
 #include <QThread>
 #include <QDebug>
@@ -12,6 +15,8 @@
 
 GManager::GManager(QObject *parent) : QObject(parent)
 {
+    GComponentManager::Instance()->loadfile(Tools::packages_default);
+    ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
 
 GManager::~GManager()

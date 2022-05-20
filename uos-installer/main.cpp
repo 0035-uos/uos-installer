@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     a.setObjectName("uos-installer");
-
+#if 0
 #ifndef QT_DEBUG
     QString log_file(QString("%1/.cache/deepin/deepin-pxe-tools.log").arg(getenv("HOME")));
 #else
@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     DLogManager::setlogFilePath(log_file);
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
-
+#endif
 #if 0
     /// eg  示例程序，后期删除
     /// 生成分区参数文件示例

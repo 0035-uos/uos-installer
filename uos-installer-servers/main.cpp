@@ -9,6 +9,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
+#if 0
 #ifndef QT_DEBUG
     QString log_file(QString("%1/.cache/deepin/deepin-pxe-tools.log").arg(getenv("HOME")));
 #else
@@ -19,12 +20,11 @@ int main(int argc, char *argv[])
     DLogManager::setlogFilePath(log_file);
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
-
+#endif
     a.setObjectName("uos-installer");
     GManager manager;
     manager.init();
     manager.sigStartCommunication();
-
 
 
     return a.exec();

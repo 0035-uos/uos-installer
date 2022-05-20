@@ -1,5 +1,6 @@
 #include "gjson.h"
 
+#include <QDebug>
 
 GJson::GJson(const QString &filename)
 {
@@ -35,6 +36,12 @@ bool GJson::loadfile(const QString &filename)
     return false;
 }
 
+bool GJson::loaddata(const QByteArray &data)
+{
+    m_doc = QJsonDocument::fromJson(data);
+    return true;
+}
+
 bool GJson::exportfile(const QString &filename) const
 {
     QFile file(filename);
@@ -61,4 +68,14 @@ bool GJson::commitData(const QJsonObject &object)
 {
     m_doc = QJsonDocument(object);
     return true;
+}
+
+QJsonArray GJson::array() const
+{
+    return m_doc.array();
+}
+
+QJsonObject GJson::object() const
+{
+    return m_doc.object();
 }

@@ -27,6 +27,7 @@ private:
     void onGetDevices(const QByteArray& data);
     void onSetParted(const QByteArray& data);
     void onSetSysInfo(const QByteArray& data);
+    void onGetComponent(const QByteArray& data);
     void onSetComponent(const QByteArray& data);
     void onStartInstall(const QByteArray& data);
     void onExit(const QByteArray& data);

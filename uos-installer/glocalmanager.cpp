@@ -8,6 +8,7 @@
 #include "gsysinfo.h"
 #include "utils/commands.h"
 #include "gnotifyinfo.h"
+#include "gcomponentmanager.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -52,7 +53,7 @@ void GLocalManager::startInstall()
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo("./parted.json")));
     m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./sysinfo.json")));
-    m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo("./component.list")));
+    m_flowList.append(GProtocol::generateFrame(cmd_get_component, "component"));
     m_flowList.append(GProtocol::startInstallFrame());
     next();
 }
@@ -74,6 +75,9 @@ void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
             qApp->exit();
         });
         return;
+    } else if (cmd == cmd_get_component) {
+        GComponentManager::Instance()->commitData(info.object().value("component").toObject());
+        GComponentManager::Instance()->exportfile("./component.json");
     }
 //    if (cmd == cmd_get_devices) {
 //        QFile file("./dev.json");

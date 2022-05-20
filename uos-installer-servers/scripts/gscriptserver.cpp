@@ -6,6 +6,7 @@
 #include "utils/utils.h"
 #include "gnotifyinfo.h"
 #include "devices/gdevices.h"
+#include "gcomponentmanager.h"
 
 #include <QtDebug>
 #include <QFile>
@@ -23,6 +24,7 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_registerFunction[cmd_start_install] = std::bind(&GScriptServer::onStartInstall, this, std::placeholders::_1);
     m_registerFunction[cmd_exit_server] = std::bind(&GScriptServer::onExit, this, std::placeholders::_1);
     m_registerFunction[cmd_set_component] = std::bind(&GScriptServer::onSetComponent, this, std::placeholders::_1);
+    m_registerFunction[cmd_get_component] = std::bind(&GScriptServer::onGetComponent, this, std::placeholders::_1);
 }
 
 void GScriptServer::start(const QByteArray &cmd, const QByteArray &parameter)
@@ -71,6 +73,15 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
     // undo check
 
     GNotifyInfo info = GNotifyInfo::reponse(cmd_set_sys_info, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
+void GScriptServer::onGetComponent(const QByteArray &data)
+{
+    qInfo() << __func__;
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_get_component, true, "component"); // undo
+    info.appendItem("component", GComponentManager::Instance()->object());
+    info.commitData();
     sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 

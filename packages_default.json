@@ -1,0 +1,12 @@
+{
+    "Base-Server": {
+        "defalut": [
+            "base-server-item1"
+        ]
+    },
+    "Server-GUI": {
+        "defalut": [
+            "server-gui-item1"
+        ]
+    }
+}

@@ -40,7 +40,8 @@ SOURCES += \
     communication/communicationinterface.cpp \
     protocol/gprotomanager.cpp \
     utils/propertyreflection.cpp \
-    protocol/serverstate.cpp
+    protocol/serverstate.cpp \
+    gcomponentmanager.cpp
 
 
 HEADERS += \
@@ -60,7 +61,8 @@ HEADERS += \
     communication/communicationinterface.h \
     protocol/gprotomanager.h \
     utils/propertyreflection.h \
-    protocol/serverstate.h
+    protocol/serverstate.h \
+    gcomponentmanager.h
 
 unix {
     target.path = /usr/lib

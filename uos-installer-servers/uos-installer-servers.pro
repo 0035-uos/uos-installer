@@ -23,6 +23,7 @@ SOURCES += \
     gheartbeatthread.cpp
 
 
+
 HEADERS += \
     communication/gcommmanager.h \
     scripts/gscriptsrunabstract.h \
@@ -36,6 +37,7 @@ HEADERS += \
     communication/gserialport.h \
     communication/gnetscoket.h \
     gheartbeatthread.h
+
 
 
 # Default rules for deployment.
