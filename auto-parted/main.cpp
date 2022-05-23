@@ -3,17 +3,23 @@
 
 #include <QDebug>
 #include <QString>
+#include <QProcess>
+#include <QStringList>
 
 #include <parted/parted.h>
 
 
-
+void test_1();
 
 int main(int argc, char *argv[])
 {
 //    QCoreApplication a(argc, argv);
 
 //    return a.exec();
+
+    test_1();
+    return 0;
+
 
     PedDevice* pDevice = nullptr;
     ped_device_probe_all();
@@ -87,3 +93,350 @@ int main(int argc, char *argv[])
 
     return 0;
 }
+
+void EnableVG(bool enable) {
+    const QString cmd { "vgchange" };
+    QString output { "" };
+    QString error  { "" };
+    const QStringList args( QStringList() << "-a" << (enable ? "y":"n"));
+    QProcess process;
+    process.start(cmd, args);
+    process.waitForStarted();
+    output = process.readAllStandardOutput();
+    error = process.readAllStandardError();
+    if (!output.isEmpty()) {
+        qInfo() << QString("EnableVG:{%1}").arg(output);
+    }
+}
+
+void test_1() {
+    bool enable_os_prober = false;
+
+    // 0. Disable VG device
+    // 1. List Devices
+    // 1.1. Retrieve metadata of each device->
+    // 2. List partitions of each device->
+    // 3. Retrieve partition metadata.
+
+    EnableVG(false);
+    // 通过 pvdisplay -s 扫描出 LVM2PV 的path
+    QProcess process;
+    QStringList devicePathList;
+    process.start("pvdisplay -s");
+    process.waitForFinished();
+    QString str = process.readLine();
+    while (str.size() > 0) {
+        str.replace("\n","");
+        auto lst = str.split("\"");
+        if (lst.size() == 3) {
+            devicePathList.append(lst[1]);
+        }
+        str = process.readLine();
+    }
+
+    // Let libparted detect all devices and construct device list.
+    ped_device_probe_all();
+
+//    DeviceList devices;
+//    const LabelItems label_items = ParseLabelDir();
+//    const MountItemList mount_items = ParseMountItems();
+
+//    OsProberItems os_prober_items;
+//    if (enable_os_prober) {
+//        RefreshOsProberItems();
+//        os_prober_items = GetOsProberItems();
+//    }
+
+    // Walk through all devices.
+    for (PedDevice* lp_device = ped_device_get_next(nullptr);
+         lp_device != nullptr;
+         lp_device = ped_device_get_next(lp_device)) {
+        PedDiskType* disk_type = ped_disk_probe(lp_device);
+
+        qInfo() << QString("DEVICE#:path:{%1} model:{%2} type:{%3}:{%4} sec:{%5}:{%6} len:{%7}: ro:{%8}")
+                   .arg(lp_device->path)
+                   .arg(lp_device->model)
+                   .arg(lp_device->type)
+                   .arg(disk_type != nullptr ? disk_type->name : "nullptr")
+                   .arg(lp_device->sector_size)
+                   .arg(lp_device->phys_sector_size)
+                   .arg(lp_device->length)
+                   .arg(lp_device->read_only);
+
+        if (1 == lp_device->read_only) {
+            qInfo() << QString("IGNORED:by readonly:{%1}, path:{%2}")
+                       .arg(lp_device->read_only)
+                       .arg(lp_device->path);
+            continue;
+        }
+
+#ifndef QT_DEBUG
+        if (PED_DEVICE_LOOP == lp_device->type) {
+            qInfo() << QString("IGNORED:by type:{%1} path:{%2}")
+                       .arg(lp_device->type)
+                       .arg(lp_device->path);
+            continue;
+        }
+#endif
+
+        const bool is_valid_dev = [&](PedDeviceType type) -> bool {
+            std::list<PedDeviceType> blackList {
+#ifndef QT_DEBUG
+                PedDeviceType::PED_DEVICE_LOOP,
+#endif
+                        PedDeviceType::PED_DEVICE_UNKNOWN,
+            };
+
+            for (PedDeviceType _type : blackList) {
+                if (_type == type) {
+                    return false;
+                }
+            }
+
+            return true;
+        }(lp_device->type);
+
+        if (!is_valid_dev) {
+            qInfo() << "device type: " << lp_device->type;
+            continue;
+        }
+    }
+#if 0
+        //Device::Ptr device(new Device);
+        if (disk_type == nullptr) {
+            // Current device has no partition table.
+            //device->table = PartitionTableType::Empty;
+            continue;
+        }
+        const QString disk_type_name(disk_type->name);
+        if (disk_type_name == /*kPartitionTableGPT*/"gpt") {
+            //device->table = PartitionTableType::GPT;
+        } else if (disk_type_name == /*kPartitionTableMsDos*/"msdos") {
+            //device->table = PartitionTableType::MsDos;
+        } else {
+            //device->table = PartitionTableType::Empty;
+            qWarning() << "other type of device:" << lp_device->path
+                       << disk_type->name << lp_device->type;
+            continue;
+        }
+
+            PedDisk* lp_disk = nullptr;
+            lp_disk = ped_disk_new(lp_device);
+
+            if (lp_disk) {
+                int max_prims = ped_disk_get_max_primary_partition_count(lp_disk);
+
+                  for (PedPartition* lp_partition = ped_disk_next_partition(lp_disk, nullptr);
+                      lp_partition != nullptr;
+                      lp_partition = ped_disk_next_partition(lp_disk, lp_partition)) {
+
+                    Partition::Ptr partition (new Partition);
+                    if (lp_partition->type == PED_PARTITION_NORMAL) {
+                      partition->type = PartitionType::Normal;
+                    } else if (lp_partition->type == PED_PARTITION_EXTENDED) {
+                      partition->type = PartitionType::Extended;
+                    } else if (lp_partition->type ==
+                        (PED_PARTITION_FREESPACE | PED_PARTITION_LOGICAL)) {
+                      partition->type = PartitionType::Unallocated;
+                    } else if (lp_partition->type == PED_PARTITION_LOGICAL) {
+                      partition->type = PartitionType::Logical;
+                    } else if (lp_partition->type == PED_PARTITION_FREESPACE) {
+                      partition->type = PartitionType::Unallocated;
+                    } else {
+                      // Ignore other types
+                      continue;
+                    }
+
+                    // Get partition flags when it is active.
+                    if (ped_partition_is_active(lp_partition)) {
+                      for (PedPartitionFlag lp_flag = ped_partition_flag_next(static_cast<PedPartitionFlag>(NULL));
+                            lp_flag; lp_flag = ped_partition_flag_next(lp_flag)) {
+                         if (ped_partition_is_flag_available(lp_partition, lp_flag) &&
+                             ped_partition_get_flag(lp_partition, lp_flag)) {
+                           //flags.append(static_cast<PartitionFlag>(lp_flag));
+                         }
+                       }
+                    }
+
+//                    if (lp_partition->fs_type) {
+                        /*
+FsType GetFsTypeByName(const QString& name) {
+    const QString lower = name.toLower();
+
+    if (lower.isEmpty() || lower == kFsUnused) return FsType::Empty;
+    if (lower.startsWith("linux-swap")) return FsType::LinuxSwap;
+
+    return FS_TYPE_MAP.key(lower, FsType::Unknown);
+}
+
+*/
+                        //partition->fs = GetFsTypeByName(lp_partition->fs_type->name);
+                      // If ESP/Boot flag is set on fat16/fat32 partition,
+                      // it shall be an EFI partition->
+//                      if ((partition->fs == FsType::Fat32 || partition->fs == FsType::Fat16) &&
+//                          partition->flags.contains(PartitionFlag::ESP)) {
+//                        partition->fs = FsType::EFI;
+//                      }
+//                    } else {
+//                      partition->fs = FsType::Unknown;
+//                    }
+//                    partition->start_sector = lp_partition->geom.start;
+//                    partition->end_sector = lp_partition->geom.end;
+
+//                    partition->partition_number = lp_partition->num;
+                    /*
+
+QString GetPartitionPath(PedPartition* lp_partition) {
+  // Result of ped_partition_get_path() need to be freed by hand.
+  char* lp_path = ped_partition_get_path(lp_partition);
+  QString path;
+  if (lp_path != nullptr) {
+    path = lp_path;
+    free(lp_path);
+  }
+  return path;
+}
+*/
+//                    partition->path = GetPartitionPath(lp_partition);
+
+//                    // Avoid reading additional filesystem information if there is no path.
+//                    if (!partition->path.isEmpty() &&
+//                        partition->type != PartitionType::Unallocated &&
+//                        partition->type != PartitionType::Extended) {
+
+//                      // Read label based on filesystem type
+//                      ReadUsage(partition->path, partition->fs, partition->freespace,
+//                                partition->length);
+//                      // If LinuxSwap partition is not mount, it is totally free.
+//                      if (partition->fs == FsType::LinuxSwap && partition->length <= 0) {
+//                        partition->length = partition->getByteLength();
+//                        partition->freespace = partition->length;
+//                      }
+
+//                      // Get partition name.
+//                      partition->name = ped_partition_get_name(lp_partition);
+//                    }
+//                    partitions.append(partition);
+//                  }
+
+
+//                // If partition table is known, scan partitions in this device->
+//                device->partitions = ReadPartitions(lp_disk);
+//                // Add additional info to partitions.
+//                for (Partition::Ptr partition : device->partitions) {
+//                    partition->device_path = device->path;
+//                    partition->sector_size = device->sector_size;
+
+//                    // 判断是否是LVM2PV
+//                    for (QString partitionPath : devicePathList) {
+//                        if (partition->path == partitionPath) {
+//                            partition->fs = FsType::LVM2PV;
+//                        }
+//                    }
+
+//                    if (!partition->path.isEmpty() &&
+//                            partition->type != PartitionType::Unallocated) {
+//                        // Read partition label and os.
+//                        const QString label_str = label_items.value(partition->path, GetPartitionLabel(partition));
+//                        if (!label_str.isEmpty()) {
+//                            partition->label = label_str;
+//                        }
+//                        for (const OsProberItem& item : os_prober_items) {
+//                            if (item.path == partition->path) {
+//                                partition->os = item.type;
+//                                break;
+//                            }
+//                        }
+
+//                        // Mark busy flag of this partition when it is mounted in system.
+//                        for (const MountItem& mount_item : mount_items) {
+//                            if (mount_item.path == partition->path) {
+//                                partition->busy = true;
+//                                break;
+//                            }
+//                        }
+//                    }
+//                }
+//                ped_disk_destroy(lp_disk);
+
+//            } else {
+//                qCritical() << "Failed to get disk object:" << device->path;
+//            }
+//        }
+    }
+#endif
+}
+
+
+/*
+bool ReadUsage(const QString& partition_path,
+               FsType fs_type,
+               qint64& freespace,
+               qint64& total) {
+  bool ok = false;
+  switch (fs_type) {
+    case FsType::Btrfs: {
+      ok = ReadBtrfsUsage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::Ext2:
+    case FsType::Ext3:
+    case FsType::Ext4: {
+      ok = ReadExt2Usage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::EFI:
+    case FsType::Fat16:
+    case FsType::Fat32: {
+      ok = ReadFat16Usage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::Hfs:
+    case FsType::HfsPlus: {
+      break;
+    }
+    case FsType::Jfs: {
+      ok = ReadJfsUsage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::LinuxSwap: {
+      ok = ReadLinuxSwapUsage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::Nilfs2: {
+      ok = ReadNilfs2Usage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::NTFS: {
+      ok = ReadNTFSUsage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::Reiser4: {
+      ok = ReadReiser4Usage(partition_path, freespace, total);
+      break;
+    }
+ case FsType::Reiserfs: {
+      ok = ReadReiserfsUsage(partition_path, freespace, total);
+      break;
+    }
+    case FsType::Xfs: {
+      ok = ReadXfsUsage(partition_path, freespace, total);
+      break;
+    }
+    default: {
+      ok = false;
+      break;
+    }
+  }
+
+  if (!ok) {
+    freespace = -1;
+    total = -1;
+    qWarning() << "Failed to read usage:" << partition_path;
+  }
+  return ok;
+}
+
+*/
+
+
