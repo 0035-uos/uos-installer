@@ -11,6 +11,7 @@ public:
     explicit PropertyReflection(QObject *parent = nullptr);
 
     virtual QJsonObject properyToJson() const;
+    virtual void jsonToPropery(const QJsonObject& object);
 signals:
 
 public slots:

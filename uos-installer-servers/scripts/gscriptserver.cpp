@@ -78,6 +78,7 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
 
 void GScriptServer::onGetComponent(const QByteArray &data)
 {
+    Q_UNUSED(data)
     qInfo() << __func__;
     GNotifyInfo info = GNotifyInfo::reponse(cmd_get_component, true, "component"); // undo
     info.appendItem("component", GComponentManager::Instance()->object());
@@ -104,10 +105,15 @@ void GScriptServer::onSetComponent(const QByteArray &data)
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
-    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+
+    ServerState::Instance()->setBootValid(true);
+    ServerState::Instance()->setCdrom("cdrom");
 
     GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info1.data()));
+
+    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+
     m_script->waitFinished();
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info2.data()));

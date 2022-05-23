@@ -30,6 +30,9 @@ private:
     void initInstaller();
 
     void appendJob(const QString& key, QObject *object);
+
+private:
+    bool initBoot();
 private:
 
     QMap<QString, JobItem> m_jobMap;

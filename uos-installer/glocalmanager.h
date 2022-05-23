@@ -2,6 +2,7 @@
 #define GLOCALMANAGER_H
 
 #include "utils/singleton.h"
+#include "gnotifyinfo.h"
 
 #include <QObject>
 
@@ -18,6 +19,8 @@ public:
 
 public slots:
     void recvData(const QByteArray& type, const QByteArray& frame);
+    void heartPackets();
+    void notifyResponse(const GNotifyInfo& info);
     void next();
 
 private:

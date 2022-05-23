@@ -62,11 +62,26 @@ void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
 {
     Q_UNUSED(type)
     if (type == heartbeat_packets) {
-        qInfo() << type;
+        QJsonObject object = QJsonDocument::fromJson(frame).object();
+        ServerState::Instance()->jsonToPropery(object);
+        heartPackets();
         return;
+    } else if (type == cmd_notify_response) {
+        GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
+        info.commitData();
+        notifyResponse(info);
+    } else {
+        qWarning() << "invalid data";
     }
-    GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
-    info.commitData();
+}
+
+void GLocalManager::heartPackets()
+{
+    //ServerState::Instance();
+}
+
+void GLocalManager::notifyResponse(const GNotifyInfo &info)
+{
     QString cmd = info.object().value("result").toObject().value("command").toString();
     qInfo() << cmd;
     if (cmd == cmd_notify_install_result) {
@@ -79,15 +94,6 @@ void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
         GComponentManager::Instance()->commitData(info.object().value("component").toObject());
         GComponentManager::Instance()->exportfile("./component.json");
     }
-//    if (cmd == cmd_get_devices) {
-//        QFile file("./dev.json");
-//        if (file.open(QFile::WriteOnly)) {
-//            file.write(info.data());
-//            file.close();
-//        }
-//    } else {
-//        qInfo() << frame;
-//    }
     next();
 }
 

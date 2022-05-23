@@ -12,9 +12,12 @@
 #include <QDebug>
 #include <QTimer>
 #include <QCoreApplication>
+#include <QFileInfo>
+#include <QDir>
 
 GManager::GManager(QObject *parent) : QObject(parent)
 {
+    initBoot();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
@@ -71,6 +74,40 @@ void GManager::appendJob(const QString &key, QObject *object)
     object->moveToThread(thread);
     m_jobMap[key] = {thread, object};
     thread->start();
+}
+
+bool GManager::initBoot()
+{
+    QFile file("/proc/cmdline");
+    ServerState::Instance()->setBootValid(false);
+    if (file.exists() && file.open(QFile::ReadOnly)) {
+        QByteArray cmdline = file.readAll();
+        file.close();
+        if (cmdline.contains("boot=casper")) {
+            ServerState::Instance()->setBootValid(true);
+            ServerState::Instance()->setBoot("casper");
+            ServerState::Instance()->setCdrom("/cdrom");
+            ServerState::Instance()->setLupinRoot("/isodevice");
+            ServerState::Instance()->setDistribution("ubuntu");
+        } else if (cmdline.contains("boot=live")) {
+            ServerState::Instance()->setBootValid(true);
+            ServerState::Instance()->setBoot("live");
+            if (QDir("/lib/live/mount/medium/live").exists()) {
+                ServerState::Instance()->setCdrom("/lib/live/mount/medium");
+            } else {
+                ServerState::Instance()->setCdrom("/run/live/medium");
+            }
+            ServerState::Instance()->setLupinRoot("/lib/live/mount/findiso");
+            ServerState::Instance()->setDistribution("debian");
+        } else {
+            ServerState::Instance()->setBootValid(false);
+        }
+        if (ServerState::Instance()->getBootValid()) {
+            ServerState::Instance()->setLiveFileSystem(ServerState::Instance()->getCdrom()+"/"+ServerState::Instance()->getBoot());
+            ServerState::Instance()->setLive(ServerState::Instance()->getBoot());
+        }
+    }
+    return false;
 }
 
 
