@@ -21,6 +21,16 @@ int main(int argc, char *argv[])
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
 #endif
+
+    QDir dir("/uos-installer");
+    if (!(dir.exists())) {
+        QDir("/").mkdir("/uos-installer");
+    }
+    if (!(dir.exists())) {
+        qWarning() << "/installer create failed";
+        return 0;
+    }
+
     a.setObjectName("uos-installer");
     GManager manager;
     manager.init();

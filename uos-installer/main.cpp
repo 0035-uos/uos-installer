@@ -26,16 +26,6 @@ int main(int argc, char *argv[])
     Parameter::Instance()->parser();
 
 
-    QDir dir("/uos-installer");
-    if (!(dir.exists())) {
-        QDir("/").mkdir("/uos-installer");
-    }
-    if (!(dir.exists())) {
-        qWarning() << "/installer create failed";
-        return 0;
-    }
-
-
     CommunicationInterface *socket = GLocalManager::Instance()->communication();
     socket->start();
     GLocalManager::Instance()->startInstall();
