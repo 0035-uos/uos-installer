@@ -94,3 +94,43 @@ void ServerState::setLupinRoot(const QString &value)
 {
     lupinRoot = value;
 }
+
+QString ServerState::getPartedFile() const
+{
+    return partedFile;
+}
+
+void ServerState::setPartedFile(const QString &value)
+{
+    partedFile = value;
+}
+
+QString ServerState::getSysInfoFile() const
+{
+    return sysInfoFile;
+}
+
+void ServerState::setSysInfoFile(const QString &value)
+{
+    sysInfoFile = value;
+}
+
+QString ServerState::getDevicePath() const
+{
+    return devicePath;
+}
+
+void ServerState::setDevicePath(const QString &value)
+{
+    devicePath = value;
+}
+
+bool ServerState::getAutoInstall() const
+{
+    return autoInstall;
+}
+
+void ServerState::setAutoInstall(bool value)
+{
+    autoInstall = value;
+}

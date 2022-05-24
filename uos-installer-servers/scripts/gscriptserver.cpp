@@ -19,6 +19,7 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_script(new GScriptsRunAbstract)
 {
     m_registerFunction[cmd_get_devices] = std::bind(&GScriptServer::onGetDevices, this, std::placeholders::_1);
+     m_registerFunction[cmd_set_install_devices] = std::bind(&GScriptServer::onSetDevice, this, std::placeholders::_1);
     m_registerFunction[cmd_set_parted] = std::bind(&GScriptServer::onSetParted, this, std::placeholders::_1);
     m_registerFunction[cmd_set_sys_info] = std::bind(&GScriptServer::onSetSysInfo, this, std::placeholders::_1);
     m_registerFunction[cmd_start_install] = std::bind(&GScriptServer::onStartInstall, this, std::placeholders::_1);
@@ -41,6 +42,13 @@ void GScriptServer::onGetDevices(const QByteArray &data)
     info.appendItem("devices", GDevices::Instance()->DevicesJson());
 
     info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
+void GScriptServer::onSetDevice(const QByteArray &data)
+{
+    qInfo() << __func__ << data;// undo
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_install_devices, true, "desc"); // undo 判断设备读取情况
     sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
@@ -91,11 +99,21 @@ void GScriptServer::onSetComponent(const QByteArray &data)
 {
     qInfo() << __func__;
     QString fp = Tools::component_path;
-    if (GJson(data).exportfile(fp)) {
-        qInfo() << "save sysinfo(json):" << fp;
-    } else {
-        qWarning() << "save sysinfo(json) failed:" << fp;
+
+    QStringList componentList = GComponentManager::Instance()->componentList();
+    QStringList plist;
+    if (componentList.contains(data)) {
+        plist  = GComponentManager::Instance()->packagesList(data);
     }
+    QFile file(fp);
+    if (!(plist.isEmpty()) && file.open(QFile::WriteOnly)) {
+        for (const QString& p : plist) {
+            file.write(p.toLocal8Bit());
+            file.write("\r\n");
+        }
+        file.close();
+    }
+    qInfo() << plist;
     // undo check
 
     GNotifyInfo info = GNotifyInfo::reponse(cmd_set_component, true, "desc"); // undo

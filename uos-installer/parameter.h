@@ -14,6 +14,24 @@ public:
     explicit Parameter(QObject *parent = nullptr);
 
     void parser();
+    QString getPartedFile() const;
+
+    QString getSysInfoFile() const;
+
+    QString getDevicePath() const;
+
+    bool getAutoInstall() const;
+
+    QString getComponentName() const;
+
+    void setPartedFile(const QString &value);
+
+    void setSysInfoFile(const QString &value);
+
+    void setDevicePath(const QString &value);
+
+    void setComponentName(const QString &value);
+
 signals:
 
 public slots:
@@ -26,7 +44,15 @@ private:
     QCommandLineOption m_partedOption;
     QCommandLineOption m_sysInfoOption;
     QCommandLineOption m_deviceOption;
+    QCommandLineOption m_componentOption;
     QCommandLineOption m_autoOption;
+
+private:
+    QString  partedFile;
+    QString  sysInfoFile;
+    QString  devicePath;
+    bool     autoInstall;
+    QString  componentName;
 };
 
 #endif // PARAMETER_H

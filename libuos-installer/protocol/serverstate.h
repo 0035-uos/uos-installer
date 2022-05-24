@@ -18,6 +18,10 @@ class ServerState : public PropertyReflection, public Singleton<ServerState>
     Q_PROPERTY(QString live READ getLive WRITE setLive)
     Q_PROPERTY(QString lupinRoot READ getLupinRoot WRITE setLupinRoot)
 
+    Q_PROPERTY(QString partedFile READ getPartedFile WRITE setPartedFile)
+    Q_PROPERTY(QString sysInfoFile READ getSysInfoFile WRITE setSysInfoFile)
+    Q_PROPERTY(QString devicePath READ getDevicePath WRITE setDevicePath)
+    Q_PROPERTY(bool autoInstall READ getAutoInstall WRITE setAutoInstall)
 public:
     explicit ServerState(QObject *parent = nullptr);
 
@@ -48,6 +52,18 @@ public:
     QString getLupinRoot() const;
     void setLupinRoot(const QString &value);
 
+    QString getPartedFile() const;
+    void setPartedFile(const QString &value);
+
+    QString getSysInfoFile() const;
+    void setSysInfoFile(const QString &value);
+
+    QString getDevicePath() const;
+    void setDevicePath(const QString &value);
+
+    bool getAutoInstall() const;
+    void setAutoInstall(bool value);
+
 private:
     int  state;
     bool loadPackagesDefault;
@@ -60,6 +76,11 @@ private:
     QString distribution;
     QString live;
     QString lupinRoot;
+
+    QString  partedFile;
+    QString  sysInfoFile;
+    QString  devicePath;
+    bool     autoInstall;
 
 };
 
