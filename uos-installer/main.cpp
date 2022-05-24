@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
     /// 同分区参数
 #endif
 
-//    QDir dir("/installer");
+//    QDir dir("/uos-installer");
 //    if (!(dir.exists())) {
 //        QDir("/").mkdir("/installer");
 //    }
