@@ -1,7 +1,10 @@
 TEMPLATE = subdirs
 
+CONFIG = ordered
+
 SUBDIRS += \
+    libuos-installer \
     uos-installer-servers \
     auto-parted \
-    uos-installer \
-    libuos-installer
+    uos-installer
+
