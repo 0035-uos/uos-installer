@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
 
 //    QDir dir("/uos-installer");
 //    if (!(dir.exists())) {
-//        QDir("/").mkdir("/installer");
+//        QDir("/").mkdir("/uos-installer");
 //    }
 //    if (!(dir.exists())) {
 //        qWarning() << "/installer create failed";

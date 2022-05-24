@@ -6,6 +6,8 @@
 
 namespace Tools {
 
+static const QString main_sh = "/usr/share/uos-installer/hooks/main.sh";
+
 static const QString parted_parameter_path = "/uos-installer/parted.json";
 static const QString sys_info_path = "/uos-installer/installer-settings.json";
 static const QString component_path = "/uos-installer/package.list";

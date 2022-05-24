@@ -24,7 +24,7 @@ void Parameter::parser()
 {
     m_parser.process(*qApp);
 
-    qInfo() << ;
+//    qInfo() << ;
     m_parser.showHelp(0);
 }
 

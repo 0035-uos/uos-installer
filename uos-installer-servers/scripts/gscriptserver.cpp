@@ -112,7 +112,7 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info1.data()));
 
-    m_script->startRun("/bin/bash", QStringList()<< "/test/main.sh" <<"/home/dml/filesystem.squashfs" << "/dev/sdb");
+    m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh << "/dev/sdb");
 
     m_script->waitFinished();
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
