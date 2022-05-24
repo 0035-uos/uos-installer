@@ -1,5 +1,5 @@
 QT -= gui
-QT += network serialport
+QT += network
 CONFIG += c++11 console
 CONFIG -= app_bundle
 
@@ -18,7 +18,6 @@ SOURCES += \
     communication/glocalsocket.cpp \
     devices/gdevices.cpp \
     devices/gparted.cpp \
-    communication/gserialport.cpp \
     communication/gnetscoket.cpp \
     gheartbeatthread.cpp
 
@@ -34,7 +33,6 @@ HEADERS += \
     communication/glocalsocket.h \
     devices/gdevices.h \
     devices/gparted.h \
-    communication/gserialport.h \
     communication/gnetscoket.h \
     gheartbeatthread.h
 

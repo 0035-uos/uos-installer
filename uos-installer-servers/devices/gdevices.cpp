@@ -99,13 +99,13 @@ void GDevices::scanDevices()
             continue;
         }
 
-       DeviceInfo *info = new DeviceInfo;
-       info->setPath(pDevice->path);
-       info->setSectorSize(pDevice->sector_size);
-       info->setPhysSectorSize(pDevice->phys_sector_size);
-       info->setLength(pDevice->length);
-       info->setType(int(pDevice->type));
-       m_devices.append(info);
+        DeviceInfo *info = new DeviceInfo;
+        info->setPath(pDevice->path);
+        info->setSectorSize(pDevice->sector_size);
+        info->setPhysSectorSize(pDevice->phys_sector_size);
+        info->setLength(pDevice->length);
+        info->setType(int(pDevice->type));
+        m_devices.append(info);
     }
 }
 

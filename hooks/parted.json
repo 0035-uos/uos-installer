@@ -1,0 +1,65 @@
+[ {
+        "filesystem": "fat32",
+        "mountPoint": "/boot/efi",
+        "label": "EFI",
+        "usage": "102400",
+        "alignStart": true,
+        "device": "",
+        "platform": [ "x86" , "sw" , "loongson" , "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "ext4",
+        "mountPoint": "/boot",
+        "label": "Boot",
+        "usage": "4096000",
+        "alignStart": true,
+        "device": "",
+        "platform": [ "x86" , "sw" , "loongson" , "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "linux-swap",
+        "mountPoint": "swap",
+        "label": "SWAP",
+        "usage": "10240",
+        "alignStart": false,
+        "device": "",
+        "platform": [ "x86", "sw", "loongson", "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "ext4",
+        "mountPoint": "/recovery",
+        "label": "Backup",
+        "usage": "20480",
+        "alignStart": false,
+        "device": "",
+        "platform": [ "x86", "sw", "loongson", "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "ext4",
+        "mountPoint": "/",
+        "label": "Roota",
+        "usage": "20480000",
+        "alignStart": true,
+        "device": "",
+        "platform": [ "x86", "sw", "loongson", "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "ext4",
+        "mountPoint": "",
+        "label": "Rootb",
+        "usage": "40960",
+        "alignStart": true,
+        "device": "",
+        "platform": [ "x86", "sw", "loongson", "arm", "loongarch64" ]
+    },
+    {
+        "filesystem": "ext4",
+        "mountPoint": "/data",
+        "label": "_dde_data",
+        "usage": "10240000",
+        "alignStart": true,
+        "isDataPartition": true,
+        "device": "",
+        "platform": [ "x86", "sw", "loongson", "arm", "loongarch64" ]
+    }
+]

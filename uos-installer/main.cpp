@@ -9,6 +9,7 @@
 #include "gparteditem.h"
 #include "gsysinfo.h"
 #include "log/DLog"
+#include "parameter.h"
 
 #include <QDebug>
 #include <QDir>
@@ -19,6 +20,9 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     a.setObjectName("uos-installer");
+
+    Parameter::Instance()->parser();
+
 #if 0
 #ifndef QT_DEBUG
     QString log_file(QString("%1/.cache/deepin/deepin-pxe-tools.log").arg(getenv("HOME")));
