@@ -1,4 +1,4 @@
-#include "gnetscoket.h"
+#include "gtcpscoket.h"
 
 #include "protocol/gprotomanager.h"
 
@@ -27,7 +27,11 @@ void GNetScoket::recvData(const QByteArray &data)
 
 bool GNetScoket::init()
 {
-    return true;
+    if (m_server == nullptr) {
+        m_server = new QTcpServer;
+        connect(m_server, &QTcpServer::newConnection, this, &GNetScoket::newConnection);
+    }
+    return m_server->listen(QHostAddress::Any);
 }
 
 void GNetScoket::newConnection()

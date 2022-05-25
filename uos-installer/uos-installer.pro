@@ -18,12 +18,18 @@ SOURCES += \
         main.cpp \
     parameter.cpp \
     glocalmanager.cpp \
-    localsocket.cpp
+    localsocket.cpp \
+    systeminfoconfig.cpp \
+    configinterface.cpp \
+    partedconfig.cpp
 
 HEADERS += \
     parameter.h \
     glocalmanager.h \
-    localsocket.h
+    localsocket.h \
+    systeminfoconfig.h \
+    configinterface.h \
+    partedconfig.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

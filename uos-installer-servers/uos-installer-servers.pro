@@ -18,8 +18,8 @@ SOURCES += \
     communication/glocalsocket.cpp \
     devices/gdevices.cpp \
     devices/gparted.cpp \
-    communication/gnetscoket.cpp \
-    gheartbeatthread.cpp
+    gheartbeatthread.cpp \
+    communication/gtcpscoket.cpp
 
 
 
@@ -33,8 +33,8 @@ HEADERS += \
     communication/glocalsocket.h \
     devices/gdevices.h \
     devices/gparted.h \
-    communication/gnetscoket.h \
-    gheartbeatthread.h
+    gheartbeatthread.h \
+    communication/gtcpscoket.h
 
 
 

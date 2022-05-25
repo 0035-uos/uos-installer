@@ -1,5 +1,5 @@
-#ifndef GNETSCOKET_H
-#define GNETSCOKET_H
+#ifndef GTCPSCOKET_H
+#define GTCPSCOKET_H
 
 #include "communication/communicationinterface.h"
 
@@ -22,4 +22,4 @@ protected:
     QTcpServer* m_server;
 };
 
-#endif // GNETSCOKET_H
+#endif // GTCPSCOKET_H

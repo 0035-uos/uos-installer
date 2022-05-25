@@ -41,7 +41,8 @@ SOURCES += \
     protocol/gprotomanager.cpp \
     utils/propertyreflection.cpp \
     protocol/serverstate.cpp \
-    gcomponentmanager.cpp
+    gcomponentmanager.cpp \
+    utils/deviceinfo.cpp
 
 
 HEADERS += \
@@ -62,7 +63,8 @@ HEADERS += \
     protocol/gprotomanager.h \
     utils/propertyreflection.h \
     protocol/serverstate.h \
-    gcomponentmanager.h
+    gcomponentmanager.h \
+    utils/deviceinfo.h
 
 unix {
     target.path = /usr/lib

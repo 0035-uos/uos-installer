@@ -10,6 +10,8 @@
 #include "gnotifyinfo.h"
 #include "gcomponentmanager.h"
 #include "parameter.h"
+#include "systeminfoconfig.h"
+#include "partedconfig.h"
 
 #include <QCoreApplication>
 #include <QDebug>
@@ -54,8 +56,6 @@ void GLocalManager::startInstall()
     }
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::generateFrame(cmd_get_component, "component"));
-    m_flowList.append(GProtocol::getPartedFrame(new GPartedInfo(Parameter::Instance()->getPartedFile())));
-    m_flowList.append(GProtocol::getSysInfoFrame(new GSysInfo(Parameter::Instance()->getSysInfoFile())));
     m_flowList.append(GProtocol::startInstallFrame());
     next();
 }
@@ -111,15 +111,15 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         comp = QString::fromStdString(c).trimmed();
 
         if (comp.isEmpty()) {
-            m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  comp_default.toLocal8Bit()));
+            m_inter->send(GProtocol::generateFrame(cmd_set_component,  comp_default.toLocal8Bit()));
         } else {
             if (componentList.contains(comp)) {
-                m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  comp.toLocal8Bit()));
+                m_inter->send(GProtocol::generateFrame(cmd_set_component,  comp.toLocal8Bit()));
             } else {
                 bool ok = false;
                 int k = comp.toInt(&ok);
                 if (ok && k > 0 && k <= componentList.length()) {
-                    m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, componentList.at(k-1).toLocal8Bit()));
+                    m_inter->send(GProtocol::generateFrame(cmd_set_component, componentList.at(k-1).toLocal8Bit()));
                 } else{
                     std::cout << tr("invalid device").toStdString() << c << std::endl;
                     qApp->exit(1);
@@ -127,6 +127,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
             }
         }
     } else if (cmd == cmd_get_devices) {
+        PartedConfig::Instance()->initData();
         QJsonArray array = info.object().value("devices").toArray();
         QStringList devlist;
         QString sdev, sdev_default;
@@ -135,7 +136,10 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
             qApp->exit(1);
         }
         for (int i = 0;i < array.count();i++) {
-            sdev = array.at(i).toObject().value("path").toString();
+            DeviceInfo *info = new DeviceInfo;
+            info->jsonToPropery(array.at(i).toObject());
+            PartedConfig::Instance()->appendDevice(info);
+            sdev = info->getPath();
             if (i == 0) sdev_default = sdev;
             devlist << sdev;
             std::cout << std::to_string(i+1) << " " << sdev.toStdString() << (i==0 ? "" :"\t[default]") << std::endl;
@@ -164,13 +168,17 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
     } else if (cmd == cmd_set_install_devices) {
         next();
     } else if (cmd == cmd_set_component) {
-        next();
+        PartedConfig::Instance()->run();
+        PartedConfig::Instance()->cleanData();
+        m_inter->send(GProtocol::getPartedFrame(PartedConfig::Instance()->data()));
     } else if (cmd == cmd_set_parted) {
-        next();
+        SystemInfoConfig::Instance()->initData();
+        SystemInfoConfig::Instance()->run();
+        SystemInfoConfig::Instance()->cleanData();
+        m_inter->send(GProtocol::getSysInfoFrame(SystemInfoConfig::Instance()->data()));
     } else if (cmd == cmd_set_sys_info) {
         next();
     } else if (cmd == cmd_start_install) {
-        next();
     }
 }
 
