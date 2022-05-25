@@ -5,6 +5,15 @@ GPartedItem::GPartedItem() : GJsonItem()
 
 }
 
+GPartedItem::GPartedItem(const QString &fs, const QString &label, const QString &mountpoint, const QString &usage):
+    GJsonItem ()
+{
+    attributes.insert("filesystem", fs);
+    attributes.insert("label", label);
+    attributes.insert("mountpoint", mountpoint);
+    attributes.insert("usage", usage);
+}
+
 void GPartedItem::setFilesystem(const QString &fs)
 {
     attributes.insert("filesystem", fs);

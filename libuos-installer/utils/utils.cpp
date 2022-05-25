@@ -2,6 +2,8 @@
 
 #include <QFile>
 #include <QByteArray>
+#include <QMap>
+#include <QProcess>
 #include <QDebug>
 
 namespace Tools {
@@ -24,23 +26,63 @@ QString scanValidFileName(const QString &path, const QString &basename)
 
 Installation installation()
 {
-    Installation mode = WTI_Default;
-    QFile file("/proc/cmdline");
-    if (file.exists() && file.open(QFile::ReadOnly)) {
-        QByteArray cmdline = file.readAll();
-        file.close();
-        if (cmdline.contains("nfsroot")) {
-            mode = WTI_PXE;
-        } else if (cmdline.contains("install-mode=local")) {
-            mode = WTI_Local;
-        } else if (cmdline.contains("install-mode=serialport")) {
-            mode = WTI_SerialPort;
-        } else if (cmdline.contains("install-mode=socket")) {
-            mode = WTI_Socket;
+    static const Installation mode = []() {
+        Installation mode = WTI_Default;
+        QFile file("/proc/cmdline");
+        if (file.exists() && file.open(QFile::ReadOnly)) {
+            QByteArray cmdline = file.readAll();
+            file.close();
+            if (cmdline.contains("nfsroot")) {
+                mode = WTI_PXE;
+            } else if (cmdline.contains("install-mode=local")) {
+                mode = WTI_Local;
+            } else if (cmdline.contains("install-mode=serialport")) {
+                mode = WTI_SerialPort;
+            } else if (cmdline.contains("install-mode=socket")) {
+                mode = WTI_Socket;
+            }
         }
-    }
-
+        return mode;
+    }();
     return mode;
+}
+
+QString getCurrentPlatform()
+{
+    static const QMap<QString, QString> arch_map{ { "x86_64",  "x86" },
+                                           { "i386", "x86" },
+                                           { "i686", "x86" },
+                                           { "amd64", "x86" },
+                                           { "x86", "x86" },
+                                           { "sw_64", "sw" },
+                                           { "mips64", "loongson" },
+                                           { "loongarch64", "loongarch64" },
+                                           { "aarch64", "arm" } };
+    static const QString platform = []() {
+        QString res;
+        QProcess p;
+        p.start("uname -m");
+        p.waitForFinished();
+        res = p.readAllStandardOutput().trimmed();
+        return res;
+    }();
+    return arch_map[platform];
+
+}
+
+bool is_sw()
+{
+    return (getCurrentPlatform() == "sw");
+}
+
+bool is_loongson()
+{
+    return (getCurrentPlatform() == "loongson");
+}
+
+bool is_loongarch64()
+{
+    return (getCurrentPlatform() == "loongarch64");
 }
 
 

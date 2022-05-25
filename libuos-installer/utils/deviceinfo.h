@@ -26,6 +26,7 @@ typedef enum {
         PED_DEVICE_NVME         = 19
 } PedDeviceType;
 */
+class PartitionInfo;
 class DeviceInfo : public PropertyReflection
 {
     Q_OBJECT
@@ -35,11 +36,15 @@ class DeviceInfo : public PropertyReflection
     Q_PROPERTY(qint64 length READ getLength WRITE setLength)
     Q_PROPERTY(int type READ getType WRITE setType)
 
+    Q_PROPERTY(QString diskType READ getDiskType WRITE setDiskType)
+
     QString     path;
     qint64      sectorSize;            /**< logical sector size */
     qint64      physSectorSize;       /**< physical sector size */
     qint64      length;                 /**< device length (LBA) */
     int type;
+
+    QString     diskType;
 public:
     explicit DeviceInfo(QObject* parent = nullptr);
     QString getPath() const;
@@ -52,6 +57,12 @@ public:
     void setLength(qint64 value);
     int getType() const;
     void setType(int value);
+    QString getDiskType() const;
+    void setDiskType(const QString &value);
+
+public:
+    QList<PartitionInfo *> m_partitions;
 };
+
 
 #endif // DEVICEINFO_H

@@ -25,6 +25,16 @@ void ServerState::setLoadPackagesDefault(bool value)
     loadPackagesDefault = value;
 }
 
+bool ServerState::getEfi() const
+{
+    return efi;
+}
+
+void ServerState::setEfi(bool value)
+{
+    efi = value;
+}
+
 bool ServerState::getBootValid() const
 {
     return bootValid;
@@ -134,3 +144,5 @@ void ServerState::setAutoInstall(bool value)
 {
     autoInstall = value;
 }
+
+

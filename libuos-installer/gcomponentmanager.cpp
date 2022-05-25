@@ -24,7 +24,7 @@ QStringList GComponentManager::packagesList(const QString &component, const QStr
     if (m_doc.object().contains(component)) {
         QJsonObject object = m_doc.object().value(component).toObject();
         if (object.contains(type)) {
-            QVariantList array = object.value("defalut").toArray().toVariantList();
+            QVariantList array = object.value(type).toArray().toVariantList();
             for (const QVariant& it : array) {
                 list << it.toString();
             }

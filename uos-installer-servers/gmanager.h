@@ -33,6 +33,7 @@ private:
 
 private:
     bool initBoot();
+    bool checkEfi();
 private:
 
     QMap<QString, JobItem> m_jobMap;

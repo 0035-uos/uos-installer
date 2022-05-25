@@ -36,5 +36,6 @@ bool GNetScoket::init()
 
 void GNetScoket::newConnection()
 {
-
+    QTcpSocket *socket = m_server->nextPendingConnection();
+    appendDevice(socket);
 }

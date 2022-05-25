@@ -42,7 +42,8 @@ SOURCES += \
     utils/propertyreflection.cpp \
     protocol/serverstate.cpp \
     gcomponentmanager.cpp \
-    utils/deviceinfo.cpp
+    utils/deviceinfo.cpp \
+    utils/partitioninfo.cpp
 
 
 HEADERS += \
@@ -64,7 +65,8 @@ HEADERS += \
     utils/propertyreflection.h \
     protocol/serverstate.h \
     gcomponentmanager.h \
-    utils/deviceinfo.h
+    utils/deviceinfo.h \
+    utils/partitioninfo.h
 
 unix {
     target.path = /usr/lib

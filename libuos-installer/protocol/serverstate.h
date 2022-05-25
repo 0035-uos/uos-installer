@@ -9,6 +9,7 @@ class ServerState : public PropertyReflection, public Singleton<ServerState>
     Q_OBJECT
     Q_PROPERTY(int state READ getState WRITE setState)
     Q_PROPERTY(bool loadPackagesDefault READ getLoadPackagesDefault WRITE setLoadPackagesDefault)
+    Q_PROPERTY(bool efi READ getEfi WRITE setEfi)
 
     Q_PROPERTY(bool bootValid READ getBootValid WRITE setBootValid)
     Q_PROPERTY(QString boot READ getBoot WRITE setBoot)
@@ -33,6 +34,9 @@ public:
 
     bool getLoadPackagesDefault() const;
     void setLoadPackagesDefault(bool value);
+
+    bool getEfi() const;
+    void setEfi(bool value);
 
     bool getBootValid() const;
     void setBootValid(bool value);
@@ -64,9 +68,13 @@ public:
     bool getAutoInstall() const;
     void setAutoInstall(bool value);
 
+
+
 private:
     int  state;
     bool loadPackagesDefault;
+
+    bool efi;
 
     // boot value
     bool bootValid;

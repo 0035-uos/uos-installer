@@ -1,11 +1,11 @@
 {
     "Base-Server": {
-        "defalut": [
+        "default": [
             "base-server-item1"
         ]
     },
     "Server-GUI": {
-        "defalut": [
+        "default": [
             "server-gui-item1"
         ]
     }

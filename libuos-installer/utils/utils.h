@@ -21,9 +21,15 @@ QString scanValidFileName(const QString& path, const QString& basename);
 
 Installation installation();
 
-
+//!
+//! \brief getCurrentPlatform
+//! \return x86/sw/loongson/loongarch64/arm
+//!
+QString getCurrentPlatform();
+bool is_sw();
+bool is_loongson();
+bool is_loongarch64();
 
 }
-
 
 #endif // UTILS_H

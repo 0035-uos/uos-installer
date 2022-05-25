@@ -170,38 +170,16 @@ void test_1() {
             continue;
         }
 
-#ifndef QT_DEBUG
-        if (PED_DEVICE_LOOP == lp_device->type) {
+//#ifndef QT_DEBUG
+        if (PED_DEVICE_LOOP == lp_device->type || PED_DEVICE_UNKNOWN == lp_device->type) {
             qInfo() << QString("IGNORED:by type:{%1} path:{%2}")
                        .arg(lp_device->type)
                        .arg(lp_device->path);
             continue;
         }
-#endif
+//#endif
 
-        const bool is_valid_dev = [&](PedDeviceType type) -> bool {
-            std::list<PedDeviceType> blackList {
-#ifndef QT_DEBUG
-                PedDeviceType::PED_DEVICE_LOOP,
-#endif
-                        PedDeviceType::PED_DEVICE_UNKNOWN,
-            };
 
-            for (PedDeviceType _type : blackList) {
-                if (_type == type) {
-                    return false;
-                }
-            }
-
-            return true;
-        }(lp_device->type);
-
-        if (!is_valid_dev) {
-            qInfo() << "device type: " << lp_device->type;
-            continue;
-        }
-    }
-#if 0
         //Device::Ptr device(new Device);
         if (disk_type == nullptr) {
             // Current device has no partition table.
@@ -220,45 +198,46 @@ void test_1() {
             continue;
         }
 
-            PedDisk* lp_disk = nullptr;
-            lp_disk = ped_disk_new(lp_device);
+        PedDisk* lp_disk = nullptr;
+        lp_disk = ped_disk_new(lp_device);
 
-            if (lp_disk) {
-                int max_prims = ped_disk_get_max_primary_partition_count(lp_disk);
+        if (lp_disk) {
+            int max_prims = ped_disk_get_max_primary_partition_count(lp_disk);
 
-                  for (PedPartition* lp_partition = ped_disk_next_partition(lp_disk, nullptr);
-                      lp_partition != nullptr;
-                      lp_partition = ped_disk_next_partition(lp_disk, lp_partition)) {
+            for (PedPartition* lp_partition = ped_disk_next_partition(lp_disk, nullptr);
+                 lp_partition != nullptr;
+                 lp_partition = ped_disk_next_partition(lp_disk, lp_partition)) {
 
-                    Partition::Ptr partition (new Partition);
-                    if (lp_partition->type == PED_PARTITION_NORMAL) {
-                      partition->type = PartitionType::Normal;
-                    } else if (lp_partition->type == PED_PARTITION_EXTENDED) {
-                      partition->type = PartitionType::Extended;
-                    } else if (lp_partition->type ==
-                        (PED_PARTITION_FREESPACE | PED_PARTITION_LOGICAL)) {
-                      partition->type = PartitionType::Unallocated;
-                    } else if (lp_partition->type == PED_PARTITION_LOGICAL) {
-                      partition->type = PartitionType::Logical;
-                    } else if (lp_partition->type == PED_PARTITION_FREESPACE) {
-                      partition->type = PartitionType::Unallocated;
-                    } else {
-                      // Ignore other types
-                      continue;
+                //Partition::Ptr partition (new Partition);
+                if (lp_partition->type == PED_PARTITION_NORMAL) {
+                    //partition->type = PartitionType::Normal;
+                } else if (lp_partition->type == PED_PARTITION_EXTENDED) {
+                    //partition->type = PartitionType::Extended;
+                } else if (lp_partition->type ==
+                           (PED_PARTITION_FREESPACE | PED_PARTITION_LOGICAL)) {
+                    //partition->type = PartitionType::Unallocated;
+                } else if (lp_partition->type == PED_PARTITION_LOGICAL) {
+                    //partition->type = PartitionType::Logical;
+                } else if (lp_partition->type == PED_PARTITION_FREESPACE) {
+                    //partition->type = PartitionType::Unallocated;
+                } else {
+                    // Ignore other types
+                    continue;
+                }
+
+                // Get partition flags when it is active.
+                if (ped_partition_is_active(lp_partition)) {
+                    for (PedPartitionFlag lp_flag = ped_partition_flag_next(static_cast<PedPartitionFlag>(NULL));
+                         lp_flag; lp_flag = ped_partition_flag_next(lp_flag)) {
+                        if (ped_partition_is_flag_available(lp_partition, lp_flag) &&
+                                ped_partition_get_flag(lp_partition, lp_flag)) {
+                            //flags.append(static_cast<PartitionFlag>(lp_flag));
+                        }
                     }
-
-                    // Get partition flags when it is active.
-                    if (ped_partition_is_active(lp_partition)) {
-                      for (PedPartitionFlag lp_flag = ped_partition_flag_next(static_cast<PedPartitionFlag>(NULL));
-                            lp_flag; lp_flag = ped_partition_flag_next(lp_flag)) {
-                         if (ped_partition_is_flag_available(lp_partition, lp_flag) &&
-                             ped_partition_get_flag(lp_partition, lp_flag)) {
-                           //flags.append(static_cast<PartitionFlag>(lp_flag));
-                         }
-                       }
-                    }
-
-//                    if (lp_partition->fs_type) {
+                }
+}}}
+#if 0
+                if (lp_partition->fs_type) {
                         /*
 FsType GetFsTypeByName(const QString& name) {
     const QString lower = name.toLower();

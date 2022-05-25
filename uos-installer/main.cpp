@@ -21,6 +21,16 @@ int main(int argc, char *argv[])
 
     a.setObjectName("uos-installer");
 
+    // Initialize log service.
+    const char kLogFileName[] = "uos-installer-server.log";
+    QString log_file;
+#ifdef QT_DEBUG
+        qCritical() << "Root privilege is required!";
+        log_file = QString("/tmp/%1").arg(kLogFileName);
+#else
+        log_file = QString("/var/log/%1").arg(kLogFileName);
+#endif
+
     Parameter::Instance()->setPartedFile("parted.json");
     Parameter::Instance()->setSysInfoFile("./sysinfo.json");
     Parameter::Instance()->parser();

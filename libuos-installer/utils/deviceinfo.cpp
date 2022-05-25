@@ -1,5 +1,7 @@
 #include "deviceinfo.h"
 
+
+
 DeviceInfo::DeviceInfo(QObject *parent) : PropertyReflection(parent)
 {
 }
@@ -53,4 +55,14 @@ int DeviceInfo::getType() const
 void DeviceInfo::setType(int value)
 {
     type = value;
+}
+
+QString DeviceInfo::getDiskType() const
+{
+    return diskType;
+}
+
+void DeviceInfo::setDiskType(const QString &value)
+{
+    diskType = value;
 }

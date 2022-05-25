@@ -18,6 +18,7 @@
 GManager::GManager(QObject *parent) : QObject(parent)
 {
     initBoot();
+    checkEfi();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
@@ -108,6 +109,15 @@ bool GManager::initBoot()
         }
     }
     return false;
+}
+
+bool GManager::checkEfi()
+{
+    ServerState::Instance()->setEfi(false);
+    if (QFileInfo::exists("/sys/firmware/efi") || Tools::is_sw()) {
+        ServerState::Instance()->setEfi(true);
+    }
+    return true;
 }
 
 

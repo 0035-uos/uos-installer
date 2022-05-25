@@ -12,16 +12,20 @@
 #include "parameter.h"
 #include "systeminfoconfig.h"
 #include "partedconfig.h"
+#include <QtConcurrent>
 
 #include <QCoreApplication>
 #include <QDebug>
 #include <QTimer>
+#include <QThread>
+
 #include <iostream>
 
 GLocalManager::GLocalManager(QObject *parent) : QObject(parent),
-    m_inter(nullptr)
+    m_inter(nullptr), m_serverReady(false)
 {
     connect(GProtoManager::Instance(), &GProtoManager::newFrame, this, &GLocalManager::recvData);
+    connect(this, &GLocalManager::sigStart, this, &GLocalManager::next);
 }
 
 CommunicationInterface *GLocalManager::communication()
@@ -57,7 +61,17 @@ void GLocalManager::startInstall()
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::generateFrame(cmd_get_component, "component"));
     m_flowList.append(GProtocol::startInstallFrame());
-    next();
+
+    QtConcurrent::run(QThreadPool::globalInstance(), [this](){
+        qInfo() << tr("waiting for the server to be ready...");
+        while (!m_serverReady) {
+            qInfo() << m_serverReady;
+            QThread::msleep(2000);
+        }
+        qInfo() << tr("server to be ready");
+        emit this->sigStart();
+    });
+    qInfo() << "startinstall";
 }
 
 void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
@@ -79,6 +93,7 @@ void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
 
 void GLocalManager::heartPackets()
 {
+    m_serverReady = true;
     //ServerState::Instance();
 }
 

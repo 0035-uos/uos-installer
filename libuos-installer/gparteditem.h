@@ -7,6 +7,7 @@ class GPartedItem : public GJsonItem
 {
 public:
     explicit GPartedItem();
+    explicit GPartedItem(const QString& fs, const QString& label, const QString& mountpoint, const QString& usage);
 
 public:
     void setFilesystem(const QString& fs);

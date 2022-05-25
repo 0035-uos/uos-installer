@@ -17,9 +17,9 @@ void GHeartBeatThread::startHeartBeat(ulong interval)
     m_exit = false;
     static GJson json;
     while (!m_exit) {
-        QThread::msleep(interval);
         json.commitData(ServerState::Instance()->properyToJson());
         sigSend(GProtocol::generateFrame(heartbeat_packets, json.data()));
+        QThread::msleep(interval);
     }
 }
 

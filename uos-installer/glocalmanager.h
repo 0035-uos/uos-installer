@@ -23,10 +23,14 @@ public slots:
     void notifyResponse(const GNotifyInfo& info);
     void next();
 
+signals:
+    void sigStart();
 private:
     CommunicationInterface* m_inter;
 
     QList<QByteArray> m_flowList;
+
+    bool m_serverReady;
 };
 
 #endif // GLOCALMANAGER_H

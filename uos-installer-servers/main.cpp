@@ -9,18 +9,19 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-#if 0
-#ifndef QT_DEBUG
-    QString log_file(QString("%1/.cache/deepin/deepin-pxe-tools.log").arg(getenv("HOME")));
+    // Initialize log service.
+    const char kLogFileName[] = "uos-installer-server.log";
+    QString log_file;
+#ifdef QT_DEBUG
+        log_file = QString("/tmp/%1").arg(kLogFileName);
 #else
-    QString log_file("/tmp/uos-installer-server.log");
+        log_file = QString("/var/log/%1").arg(kLogFileName);
 #endif
     DLogManager::setLogFormat("%{time}{yyyy-MM-dd, HH:mm:ss.zzz} [%{type:-7}] "
                               "[%{function:-35} %{line}] %{message}\n");
     DLogManager::setlogFilePath(log_file);
     DLogManager::registerConsoleAppender();
     DLogManager::registerFileAppender();
-#endif
 
     QDir dir("/uos-installer");
     if (!(dir.exists())) {

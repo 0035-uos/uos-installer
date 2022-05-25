@@ -47,8 +47,9 @@ void GScriptServer::onGetDevices(const QByteArray &data)
 
 void GScriptServer::onSetDevice(const QByteArray &data)
 {
-    qInfo() << __func__ << data;// undo
-    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_install_devices, true, "desc"); // undo 判断设备读取情况
+    qInfo() << __func__;// undo
+    ServerState::Instance()->setDevicePath(data);
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_install_devices, true, "desc");
     sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
@@ -113,7 +114,6 @@ void GScriptServer::onSetComponent(const QByteArray &data)
         }
         file.close();
     }
-    qInfo() << plist;
     // undo check
 
     GNotifyInfo info = GNotifyInfo::reponse(cmd_set_component, true, "desc"); // undo
@@ -123,6 +123,7 @@ void GScriptServer::onSetComponent(const QByteArray &data)
 void GScriptServer::onStartInstall(const QByteArray &data)
 {
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
+    qInfo() << ServerState::Instance()->getDevicePath();
 
     ServerState::Instance()->setBootValid(true);
     ServerState::Instance()->setCdrom("cdrom");

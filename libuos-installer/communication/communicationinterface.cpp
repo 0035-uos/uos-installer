@@ -1,5 +1,6 @@
 #include "communicationinterface.h"
 
+#include <QDebug>
 
 CommunicationInterface::CommunicationInterface(QObject *parent):
     QObject (parent)
@@ -53,6 +54,7 @@ void CommunicationInterface::appendDevice(QIODevice *dev)
     }
     connect(dev, &QIODevice::readyRead, this, &CommunicationInterface::readData);
     m_ioDevices.append(dev);
+    qInfo() << "new connect:" << dev->objectName();
 }
 
 void CommunicationInterface::writeData(const QByteArray &data)
