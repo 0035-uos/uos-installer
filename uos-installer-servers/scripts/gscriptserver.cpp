@@ -110,7 +110,7 @@ void GScriptServer::onSetComponent(const QByteArray &data)
     if (!(plist.isEmpty()) && file.open(QFile::WriteOnly)) {
         for (const QString& p : plist) {
             file.write(p.toLocal8Bit());
-            file.write("\r\n");
+            file.write("\n");
         }
         file.close();
     }
