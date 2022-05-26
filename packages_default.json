@@ -1,12 +1,12 @@
 {
     "Base-Server": {
         "default": [
-            "base-server-item1"
+            "task-desktop"
         ]
     },
     "Server-GUI": {
         "default": [
-            "server-gui-item1"
+            "task-dde-desktop-essentials"
         ]
     }
 }
