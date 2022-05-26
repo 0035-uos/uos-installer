@@ -31,5 +31,10 @@ else
     squashfs_path=$CDROM/live/filesystem.squashfs
 fi
 
+if [ -f $CDROM/live/minios.img ];then
+  squashfs_path=$CDROM/live/minios.img
+fi
+
+
 bash $work_path/un_squashfs.sh $squashfs_path
 bash $work_path/set_repo.sh $isomount_path

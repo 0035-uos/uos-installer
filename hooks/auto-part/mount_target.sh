@@ -36,8 +36,7 @@ find_extended(){
       extended_partnum=$(parted -s "$DEVICE" print |grep extended |awk '{print $1}')
       echo "$extended_partnum"
     else
-      echo "extended part error!!!"
-      exit 3
+      echo 0
     fi
   else
     echo 0

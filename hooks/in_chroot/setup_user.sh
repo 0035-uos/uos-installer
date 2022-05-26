@@ -38,7 +38,7 @@ add_user_to_existed_group() {
 # Setup username, password and hostname.
 setup_username_password_hostname() {
   local USERNAME HOSTNAME PASSWORD ROOTPASSWORD REAL_PASSWORD REAL_ROOTPASSWORD
-  USERNAME=$(jq -r ".user.name" ${CONF_SETTING})
+  USERNAME=$(jq -r ".user.username" ${CONF_SETTING})
   PASSWORD=$(jq -r ".user.password" ${CONF_SETTING})
   HOSTNAME=$(jq -r ".user.hostname" ${CONF_SETTING})
   ROOTPASSWORD=$(jq -r ".user.rootpassword" ${CONF_SETTING})
@@ -77,13 +77,13 @@ setup_username_password_hostname() {
       msg "set password to empty"
       passwd -d "${USERNAME}"
   else
-    REAL_PASSWORD=$(echo "${PASSWORD}" | base64 -d)
+    REAL_PASSWORD="${PASSWORD}"
     echo "${USERNAME}:${REAL_PASSWORD}" | chpasswd
   fi
   
   # Update root password. 
   if [ -n "${DI_ROOTPASSWORD}" ]; then
-    REAL_ROOTPASSWORD=$(echo "${ROOTPASSWORD}" | base64 -d)
+    REAL_ROOTPASSWORD="${ROOTPASSWORD}"
     msg "--- ROOTPASSWORD = <${ROOTPASSWORD}>--- "
   fi
 
