@@ -23,6 +23,13 @@ void PartedConfig::initData()
 
 void PartedConfig::run()
 {
+    /// undo
+    /// 1. 自动分区（默认状态）
+    /// 2. 根据架构和启动方式以及硬盘大小确定需要那些分区
+    /// 3. 用户交互式分区
+    /// 4. 根据用户导入的配置文件来分区（oem定制）
+
+
     for (const DeviceInfo* &info : m_devicelist) {
         qInfo() << info->getPath() << info->getSectorSize() << info->getLength() << (1.0 * info->getSectorSize() * info->getLength()/GByte);
     }

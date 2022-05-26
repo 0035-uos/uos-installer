@@ -21,7 +21,8 @@ SOURCES += \
     localsocket.cpp \
     systeminfoconfig.cpp \
     configinterface.cpp \
-    partedconfig.cpp
+    partedconfig.cpp \
+    settingsmanager.cpp
 
 HEADERS += \
     parameter.h \
@@ -29,7 +30,8 @@ HEADERS += \
     localsocket.h \
     systeminfoconfig.h \
     configinterface.h \
-    partedconfig.h
+    partedconfig.h \
+    settingsmanager.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
