@@ -1,2 +1,3 @@
 uos-installer-servers/uos-installer-servers /usr/bin/
+packages_default.json  /usr/share/uos-installer/
 hooks /usr/share/uos-installer/
