@@ -30,9 +30,6 @@ int main(int argc, char *argv[])
 #else
         log_file = QString("/var/log/%1").arg(kLogFileName);
 #endif
-
-    Parameter::Instance()->setPartedFile("parted.json");
-    Parameter::Instance()->setSysInfoFile("./sysinfo.json");
     Parameter::Instance()->parser();
 
 
