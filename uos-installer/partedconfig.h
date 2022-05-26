@@ -20,6 +20,9 @@ public:
     GJson* data();
 
     void appendDevice(const DeviceInfo *info);
+    QString defaultDevicePath() const;
+    void setDefaultDevicePath(const QString &defaultDevicePath);
+
 signals:
 
 public slots:
@@ -27,6 +30,7 @@ public slots:
 private:
     GPartedInfo* m_data;
     QList<const DeviceInfo*> m_devicelist;
+    QString m_defaultDevicePath;
 };
 
 #endif // PARTEDCONFIG_H

@@ -166,14 +166,17 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
 
         if (sdev.isEmpty()) {
             m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  sdev_default.toLocal8Bit()));
+            PartedConfig::Instance()->setDefaultDevicePath(sdev_default);
         } else {
             if (devlist.contains(sdev)) {
                 m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  sdev.toLocal8Bit()));
+                PartedConfig::Instance()->setDefaultDevicePath(sdev);
             } else {
                 bool ok = false;
                 int k = sdev.toInt(&ok);
                 if (ok && k > 0 && k <= devlist.length()) {
                     m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, devlist.at(k-1).toLocal8Bit()));
+                    PartedConfig::Instance()->setDefaultDevicePath(devlist.at(k-1).toLocal8Bit());
                 } else{
                     qInfo() << tr("invalid device") << sdev;
                     qApp->exit(1);

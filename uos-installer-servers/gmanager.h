@@ -34,6 +34,7 @@ private:
 private:
     bool initBoot();
     bool checkEfi();
+    bool readMemInfo();
 private:
 
     QMap<QString, JobItem> m_jobMap;

@@ -23,6 +23,15 @@ class ServerState : public PropertyReflection, public Singleton<ServerState>
     Q_PROPERTY(QString sysInfoFile READ getSysInfoFile WRITE setSysInfoFile)
     Q_PROPERTY(QString devicePath READ getDevicePath WRITE setDevicePath)
     Q_PROPERTY(bool autoInstall READ getAutoInstall WRITE setAutoInstall)
+
+    Q_PROPERTY(qint64 buffers READ getBuffers WRITE setBuffers)
+    Q_PROPERTY(qint64 cached READ getCached WRITE setCached)
+    Q_PROPERTY(qint64 mem_available READ getMemAvailable WRITE setMemAvailable)
+    Q_PROPERTY(qint64 mem_free READ getMemFree WRITE setMemFree)
+    Q_PROPERTY(qint64 mem_total READ getMemTotal WRITE setMemTotal)
+    Q_PROPERTY(qint64 swap_free READ getSwapFree WRITE setSwapFree)
+    Q_PROPERTY(qint64 swap_total READ getSwapTotal WRITE setSwapTotal)
+
 public:
     explicit ServerState(QObject *parent = nullptr);
 
@@ -70,6 +79,27 @@ public:
 
 
 
+    qint64 getBuffers() const;
+    void setBuffers(const qint64 &value);
+
+    qint64 getCached() const;
+    void setCached(const qint64 &value);
+
+    qint64 getMemAvailable() const;
+    void setMemAvailable(const qint64 &value);
+
+    qint64 getMemFree() const;
+    void setMemFree(const qint64 &value);
+
+    qint64 getMemTotal() const;
+    void setMemTotal(const qint64 &value);
+
+    qint64 getSwapFree() const;
+    void setSwapFree(const qint64 &value);
+
+    qint64 getSwapTotal() const;
+    void setSwapTotal(const qint64 &value);
+
 private:
     int  state;
     bool loadPackagesDefault;
@@ -90,6 +120,14 @@ private:
     QString  devicePath;
     bool     autoInstall;
 
+    // memeinfo
+    qint64 buffers;
+    qint64 cached;
+    qint64 memAvailable;
+    qint64 memFree;
+    qint64 memTotal;
+    qint64 swapFree;
+    qint64 swapTotal;
 };
 
 #endif // SERVERSTATE_H

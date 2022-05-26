@@ -145,4 +145,74 @@ void ServerState::setAutoInstall(bool value)
     autoInstall = value;
 }
 
+qint64 ServerState::getBuffers() const
+{
+    return buffers;
+}
+
+void ServerState::setBuffers(const qint64 &value)
+{
+    buffers = value;
+}
+
+qint64 ServerState::getCached() const
+{
+    return cached;
+}
+
+void ServerState::setCached(const qint64 &value)
+{
+    cached = value;
+}
+
+qint64 ServerState::getMemAvailable() const
+{
+    return memAvailable;
+}
+
+void ServerState::setMemAvailable(const qint64 &value)
+{
+    memAvailable = value;
+}
+
+qint64 ServerState::getMemFree() const
+{
+    return memFree;
+}
+
+void ServerState::setMemFree(const qint64 &value)
+{
+    memFree = value;
+}
+
+qint64 ServerState::getMemTotal() const
+{
+    return memTotal;
+}
+
+void ServerState::setMemTotal(const qint64 &value)
+{
+    memTotal = value;
+}
+
+qint64 ServerState::getSwapFree() const
+{
+    return swapFree;
+}
+
+void ServerState::setSwapFree(const qint64 &value)
+{
+    swapFree = value;
+}
+
+qint64 ServerState::getSwapTotal() const
+{
+    return swapTotal;
+}
+
+void ServerState::setSwapTotal(const qint64 &value)
+{
+    swapTotal = value;
+}
+
 

@@ -1,0 +1,44 @@
+Source: uos-installer
+Section: admin
+Priority: optional
+Maintainer: Zhang bingyi <zhangbingyi@uniontech.com>
+Build-Depends: debhelper , 
+    qt5-default, 
+    libqt5serialport5-dev, 
+    build-essential,
+    libparted-dev,
+    g++ (>=6.3.0),
+Standards-Version: 4.1.3
+Homepage: https://github.com/0035-uos/uos-installer
+
+
+Package: uos-installer-servers
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+    jq, 
+    parted, 
+    fdisk, 
+    grub2-common, 
+    squashfs-tools, 
+    locales, 
+    sed,
+    passwd, 
+    coreutils, 
+    ntfs-3g, 
+    os-prober, 
+    xfsprogs, 
+    jfsutils
+Description: server for uos-installer
+ server for uos-installer
+
+Package: uos-installer
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: app for uos-installer
+ app for uos-installer
+
+Package: uos-installer-dev
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: head file for uos-installer
+ head file for uos-installer

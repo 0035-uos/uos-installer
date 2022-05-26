@@ -30,6 +30,10 @@ bool is_sw();
 bool is_loongson();
 bool is_loongarch64();
 
+
+QString ReadFile(const QString& path);
+
+
 }
 
 #endif // UTILS_H

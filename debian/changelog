@@ -1,0 +1,5 @@
+uos-installer (1.0-1) unstable; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- unknown <uos@uos-PC>  Tue, 24 May 2022 15:45:21 +0800

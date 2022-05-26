@@ -15,10 +15,13 @@
 #include <QFileInfo>
 #include <QDir>
 
+static const QString memInfoFile = "/proc/meminfo";
+
 GManager::GManager(QObject *parent) : QObject(parent)
 {
     initBoot();
     checkEfi();
+    readMemInfo();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
@@ -119,6 +122,42 @@ bool GManager::checkEfi()
     }
     return true;
 }
+
+bool GManager::readMemInfo()
+{
+    const QString content = Tools::ReadFile(memInfoFile);
+    if (content.isEmpty()) {
+        qWarning() << "Failed to read meminfo!";
+        return false;
+    }
+
+    QHash<QString, qint64> hash;
+    for (const QString& line : content.split('\n')) {
+        const int index = line.indexOf(':');
+        if (index > -1) {
+            QString str_value = line.mid(index + 1);
+            str_value.remove("kB");
+            str_value = str_value.trimmed();
+            // Convert kB to byte.
+            const qint64 value = str_value.toLongLong() * 1024;
+            hash.insert(line.left(index), value);
+            qInfo() << line.left(index) << value;
+        }
+    }
+
+    ServerState::Instance()->setBuffers(hash.value("Buffers"));
+    ServerState::Instance()->setCached(hash.value("Cached"));
+    ServerState::Instance()->setMemAvailable(hash.value("MemAvailable"));
+    ServerState::Instance()->setMemFree(hash.value("MemFree"));
+    ServerState::Instance()->setMemTotal(hash.value("MemTotal"));
+    ServerState::Instance()->setSwapFree(hash.value("SwapFree"));
+    ServerState::Instance()->setSwapTotal(hash.value("SwapTotal"));
+    return true;
+}
+
+
+
+
 
 
 
