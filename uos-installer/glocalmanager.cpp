@@ -177,7 +177,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
                 if (ok && k > 0 && k <= devlist.length()) {
                     m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, devlist.at(k-1).toLocal8Bit()));
                     PartedConfig::Instance()->setDefaultDevicePath(devlist.at(k-1).toLocal8Bit());
-                } else{
+                } else {
                     qInfo() << tr("invalid device") << sdev;
                     qApp->exit(1);
                 }

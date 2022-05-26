@@ -72,6 +72,14 @@ void PartedConfig::run()
     }
     free_sector = free_sector - efi_sector - swapSector;
 
+    // 兼容pmon固件
+    if (Tools::is_x86()) {
+        qint64 boot_sector = qint64(1.5 * GByte / dev->getSectorSize());
+        GPartedItem item{"ext3", "Boot", "/boot", QString::number(boot_sector)};
+        m_data->appendItem(&item);
+        free_sector -= boot_sector;
+    }
+
     qint64 parted_limit = 64 * GByte / dev->getSectorSize(); // undo
     if (free_sector >= parted_limit) { // /(%40) + /data(60%)
         qint64 roota_sector = qint64(free_sector * .4);

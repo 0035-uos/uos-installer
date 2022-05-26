@@ -141,7 +141,7 @@ bool GManager::readMemInfo()
             // Convert kB to byte.
             const qint64 value = str_value.toLongLong() * 1024;
             hash.insert(line.left(index), value);
-            qInfo() << line.left(index) << value;
+            //qInfo() << line.left(index) << value;
         }
     }
 

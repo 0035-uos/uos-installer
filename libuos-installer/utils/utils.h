@@ -26,6 +26,7 @@ Installation installation();
 //! \return x86/sw/loongson/loongarch64/arm
 //!
 QString getCurrentPlatform();
+bool is_x86();
 bool is_sw();
 bool is_loongson();
 bool is_loongarch64();

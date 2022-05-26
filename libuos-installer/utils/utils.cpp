@@ -70,6 +70,11 @@ QString getCurrentPlatform()
 
 }
 
+bool is_x86()
+{
+    return (getCurrentPlatform() == "x86");
+}
+
 bool is_sw()
 {
     return (getCurrentPlatform() == "sw");
@@ -101,6 +106,8 @@ QString ReadFile(const QString &path)
         return "";
     }
 }
+
+
 
 
 
