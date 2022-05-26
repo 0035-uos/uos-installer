@@ -29,7 +29,7 @@ int GScriptsRunAbstract::asyncThread(int timeout)
 {
     qInfo() << m_command << m_args << timeout;
     m_quit = false;
-    QProcess *process = new QProcess;
+    QProcess *process = new QProcess(this);
     process->setEnvironment(QStringList() << "LANG=zh_CN.utf-8");
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
           [process](int, QProcess::ExitStatus){

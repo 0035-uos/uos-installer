@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
     a.setObjectName("uos-installer");
 
     // Initialize log service.
-    const char kLogFileName[] = "uos-installer-server.log";
+    const char kLogFileName[] = "uos-installer.log";
     QString log_file;
 #ifdef QT_DEBUG
         qCritical() << "Root privilege is required!";

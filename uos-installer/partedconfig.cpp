@@ -73,7 +73,7 @@ void PartedConfig::run()
     free_sector = free_sector - efi_sector - swapSector;
 
     // 兼容pmon固件
-    if (Tools::is_x86()) {
+    if (!(Tools::is_x86())) {
         qint64 boot_sector = qint64(1.5 * GByte / dev->getSectorSize());
         GPartedItem item{"ext3", "Boot", "/boot", QString::number(boot_sector)};
         m_data->appendItem(&item);

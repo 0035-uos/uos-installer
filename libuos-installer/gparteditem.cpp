@@ -10,7 +10,7 @@ GPartedItem::GPartedItem(const QString &fs, const QString &label, const QString 
 {
     attributes.insert("filesystem", fs);
     attributes.insert("label", label);
-    attributes.insert("mountpoint", mountpoint);
+    attributes.insert("mountPoint", mountpoint);
     attributes.insert("usage", usage);
 }
 
@@ -26,7 +26,7 @@ void GPartedItem::setlabel(const QString &label)
 
 void GPartedItem::setMountPoint(const QString &mountpoint)
 {
-    attributes.insert("mountpoint", mountpoint);
+    attributes.insert("mountPoint", mountpoint);
 }
 
 void GPartedItem::setUsage(const QString &usage)
