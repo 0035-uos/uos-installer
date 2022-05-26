@@ -125,13 +125,10 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     qInfo() << __func__ << data; // 开始安装，调用启动脚本
     qInfo() << ServerState::Instance()->getDevicePath();
 
-    ServerState::Instance()->setBootValid(true);
-    ServerState::Instance()->setCdrom("cdrom");
-
     GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info1.data()));
 
-    m_script->startRun("/bin/bash", QStringList()<< /*Tools::main_sh */"/home/deepin/main.sh"<< ServerState::Instance()->getDevicePath());
+    m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh<< ServerState::Instance()->getDevicePath());
 
     m_script->waitFinished();
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
