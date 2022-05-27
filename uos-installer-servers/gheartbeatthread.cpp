@@ -23,6 +23,11 @@ void GHeartBeatThread::startHeartBeat(ulong interval)
     }
 }
 
+bool GHeartBeatThread::exit() const
+{
+    return m_exit;
+}
+
 void GHeartBeatThread::setExit(bool exit)
 {
     m_exit = exit;

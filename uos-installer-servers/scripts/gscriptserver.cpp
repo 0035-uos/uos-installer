@@ -131,6 +131,7 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh << ServerState::Instance()->getDevicePath());
 
     m_script->waitFinished();
+    qInfo() << "finished";
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info2.data()));
 }

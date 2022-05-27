@@ -25,12 +25,13 @@ int main(int argc, char *argv[])
     const char kLogFileName[] = "uos-installer.log";
     QString log_file;
 #ifdef QT_DEBUG
-        qCritical() << "Root privilege is required!";
-        log_file = QString("/tmp/%1").arg(kLogFileName);
+    qCritical() << "Root privilege is required!";
+    log_file = QString("/tmp/%1").arg(kLogFileName);
 #else
-        log_file = QString("/var/log/%1").arg(kLogFileName);
+    log_file = QString("/var/log/%1").arg(kLogFileName);
 #endif
-    Parameter::Instance()->parser();
+    if (argc > 1)
+        Parameter::Instance()->parser();
 
 
     CommunicationInterface *socket = GLocalManager::Instance()->communication();

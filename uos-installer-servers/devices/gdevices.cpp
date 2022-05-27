@@ -74,7 +74,7 @@ void GDevices::scanDisk(void *device, QList<PartitionInfo *> &partitions)
 {
     PedDisk* lp_disk = reinterpret_cast<PedDisk*>(device);
     if (!lp_disk) return;
-    int max_prims = ped_disk_get_max_primary_partition_count(lp_disk);
+    //int max_prims = ped_disk_get_max_primary_partition_count(lp_disk);
 
     for (PedPartition* lp_partition = ped_disk_next_partition(lp_disk, nullptr);
          lp_partition != nullptr;

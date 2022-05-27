@@ -51,7 +51,6 @@ int GScriptsRunAbstract::asyncThread(int timeout)
 
     process->waitForStarted(3000);
     process->waitForFinished(timeout);
-    qInfo() << "finished";
     emit finished();
     return 0;
 }

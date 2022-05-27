@@ -8,11 +8,13 @@
 class GHeartBeatThread : public QObject, public Singleton<GHeartBeatThread>
 {
     Q_OBJECT
-    Q_PROPERTY(bool m_exit WRITE setExit)
+    Q_PROPERTY(bool m_exit READ exit WRITE setExit)
 public:
     explicit GHeartBeatThread(QObject *parent = nullptr);
 
     void setExit(bool exit);
+
+    bool exit() const;
 
 signals:
     void sigSend(const QByteArray&);
