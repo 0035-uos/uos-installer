@@ -15,6 +15,11 @@ static const QString packages_default = "/usr/share/uos-installer/packages_defau
 //static const QString packages_default = "/home/deepin/uos-installer/packages_default.json";
 
 
+static const qint64 TByte = 1024*1024*1024*1024L;
+static const qint64 GByte = 1024*1024*1024L;
+static const qint64 MByte = 1024*1024L;
+static const qint64 KByte = 1024L;
+
 enum Installation{WTI_Default = 0, WTI_Local, WTI_SerialPort, WTI_Socket, WTI_PXE, WTI_AutoInstall};
 
 QString scanValidFileName(const QString& path, const QString& basename);

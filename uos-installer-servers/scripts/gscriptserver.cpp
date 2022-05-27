@@ -98,7 +98,7 @@ void GScriptServer::onGetComponent(const QByteArray &data)
 
 void GScriptServer::onSetComponent(const QByteArray &data)
 {
-    qInfo() << __func__;
+    qInfo() << __func__ << data;
     QString fp = Tools::component_path;
 
     QStringList componentList = GComponentManager::Instance()->componentList();

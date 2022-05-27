@@ -12,8 +12,9 @@
 #include "parameter.h"
 #include "systeminfoconfig.h"
 #include "partedconfig.h"
-#include <QtConcurrent>
+#include "userinput.h"
 
+#include <QtConcurrent>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QTimer>
@@ -65,7 +66,6 @@ void GLocalManager::startInstall()
     QtConcurrent::run(QThreadPool::globalInstance(), [this](){
         qInfo() << tr("waiting for the server to be ready...");
         while (!m_serverReady) {
-            qInfo() << m_serverReady;
             QThread::msleep(2000);
         }
         qInfo() << tr("server to be ready");
@@ -100,89 +100,47 @@ void GLocalManager::heartPackets()
 void GLocalManager::notifyResponse(const GNotifyInfo &info)
 {
     QString cmd = info.object().value("result").toObject().value("command").toString();
-    qInfo() << cmd;
+    //qInfo() << cmd;
     if (cmd == cmd_notify_install_result) {
         m_inter->send(GProtocol::exitServerFrame());
         QTimer::singleShot(2000, this, []{
             qApp->exit();
         });
+        qInfo() << tr("Install finished.");
         return;
     } else if (cmd == cmd_get_component) {
         GComponentManager::Instance()->commitData(info.object().value("component").toObject());
         GComponentManager::Instance()->exportfile("./component.json");
         QStringList componentList = GComponentManager::Instance()->componentList();
-        QString comp, comp_default;
         if (componentList.count() <= 0) {
             qInfo() << tr("not found valid component");
             qApp->exit(1);
         }
-        for (int i = 0; i < componentList.length(); i++) {
-            if (i == 0) comp_default = componentList.at(i);
-            std::cout << std::to_string(i+1) << " " << componentList.at(i).toStdString() << (i==0 ? "" :"\t[default]") << std::endl;
-        }
-        std::cout << tr("please select install component:").toStdString();
-        std::string c;
-        std::cin >> c;
-        comp = QString::fromStdString(c).trimmed();
-
-        if (comp.isEmpty()) {
-            m_inter->send(GProtocol::generateFrame(cmd_set_component,  comp_default.toLocal8Bit()));
-        } else {
-            if (componentList.contains(comp)) {
-                m_inter->send(GProtocol::generateFrame(cmd_set_component,  comp.toLocal8Bit()));
-            } else {
-                bool ok = false;
-                int k = comp.toInt(&ok);
-                if (ok && k > 0 && k <= componentList.length()) {
-                    m_inter->send(GProtocol::generateFrame(cmd_set_component, componentList.at(k-1).toLocal8Bit()));
-                } else{
-                    std::cout << tr("invalid device").toStdString() << c << std::endl;
-                    qApp->exit(1);
-                }
-            }
-        }
+        int outIndex;
+        QString outResult;
+        UserInput::UserSelect(componentList, tr("please select install component:"), outIndex, outResult);
+        m_inter->send(GProtocol::generateFrame(cmd_set_component,  outResult.toLocal8Bit()));
     } else if (cmd == cmd_get_devices) {
         PartedConfig::Instance()->initData();
         QJsonArray array = info.object().value("devices").toArray();
-        QStringList devlist;
-        QString sdev, sdev_default;
+        QStringList devlist, devdesc;
         if (array.count() <= 0) {
             qInfo() << tr("not found valid devices");
             qApp->exit(1);
         }
+
         for (int i = 0;i < array.count();i++) {
             DeviceInfo *info = new DeviceInfo;
             info->jsonToPropery(array.at(i).toObject());
             PartedConfig::Instance()->appendDevice(info);
-            sdev = info->getPath();
-            if (i == 0) sdev_default = sdev;
-            devlist << sdev;
-            std::cout << std::to_string(i+1) << " " << sdev.toStdString() << (i==0 ? "" :"\t[default]") << std::endl;
+            devlist << info->getPath();
+            devdesc <<  QString("(%1G)").arg(1.0*info->getLength()*info->getSectorSize()/Tools::GByte);
         }
-        std::cout << tr("please select install device:").toStdString();
-        std::string dev;
-        std::cin >> dev;
-        sdev = QString::fromStdString(dev).trimmed();
-
-        if (sdev.isEmpty()) {
-            m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  sdev_default.toLocal8Bit()));
-            PartedConfig::Instance()->setDefaultDevicePath(sdev_default);
-        } else {
-            if (devlist.contains(sdev)) {
-                m_inter->send(GProtocol::generateFrame(cmd_set_install_devices,  sdev.toLocal8Bit()));
-                PartedConfig::Instance()->setDefaultDevicePath(sdev);
-            } else {
-                bool ok = false;
-                int k = sdev.toInt(&ok);
-                if (ok && k > 0 && k <= devlist.length()) {
-                    m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, devlist.at(k-1).toLocal8Bit()));
-                    PartedConfig::Instance()->setDefaultDevicePath(devlist.at(k-1).toLocal8Bit());
-                } else {
-                    qInfo() << tr("invalid device") << sdev;
-                    qApp->exit(1);
-                }
-            }
-        }
+        int outIndex;
+        QString outResult;
+        UserInput::UserSelect(devlist, tr("please select install device:"), outIndex, outResult, true, devdesc);
+        m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, outResult.toLocal8Bit()));
+        PartedConfig::Instance()->setDefaultDevicePath(outResult);
     } else if (cmd == cmd_set_install_devices) {
         next();
     } else if (cmd == cmd_set_component) {
@@ -197,6 +155,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
     } else if (cmd == cmd_set_sys_info) {
         next();
     } else if (cmd == cmd_start_install) {
+        qInfo() << tr("Installing, please waiting....");
     }
 }
 
