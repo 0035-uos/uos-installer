@@ -57,7 +57,8 @@ void GDevices::scanDevices()
         info->setLength(pDevice->length);
         info->setType(int(pDevice->type));
 
-        info->setDiskType(QString(disk_type->name)); // gpt/msdos
+        if (disk_type)
+            info->setDiskType(QString(disk_type->name)); // gpt/msdos
 #if 0
         if (info->getDiskType() == "gpt" || info->getDiskType() == "msdos") {
             PedDisk* lp_disk = ped_disk_new(pDevice);
