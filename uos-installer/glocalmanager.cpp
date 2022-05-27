@@ -118,7 +118,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         }
         int outIndex;
         QString outResult;
-        UserInput::UserSelect(componentList, tr("please select install component:"), outIndex, outResult);
+        UserInput::UserSelect(outIndex, outResult, componentList, tr("please select install component:"));
         m_inter->send(GProtocol::generateFrame(cmd_set_component,  outResult.toLocal8Bit()));
     } else if (cmd == cmd_get_devices) {
         PartedConfig::Instance()->initData();
@@ -138,7 +138,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         }
         int outIndex;
         QString outResult;
-        UserInput::UserSelect(devlist, tr("please select install device:"), outIndex, outResult, true, devdesc);
+        UserInput::UserSelect(outIndex, outResult, devlist, tr("please select install device:"), true, devdesc);
         m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, outResult.toLocal8Bit()));
         PartedConfig::Instance()->setDefaultDevicePath(outResult);
     } else if (cmd == cmd_set_install_devices) {
