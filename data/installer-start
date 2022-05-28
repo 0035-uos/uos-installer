@@ -23,7 +23,7 @@ get_cmd() {
   fi
 }
 
-systemctl start installer-daemon
+systemctl start uos-installer-server
 sleep 5
 
 if [ "$(get_cmd install-mode)" = gui ]; then

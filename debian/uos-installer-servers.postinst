@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+
+ln -s /usr/lib/systemd/system/uos-installer-start.service /etc/systemd/system
+

@@ -9,7 +9,7 @@
 
 [Unit]
 Description=Start installer-cli on %I
-After=installer-daemon.service
+After=uos-installer-server.service 
 
 [Service]
 ExecStart=-/sbin/agetty -n -l /usr/bin/uos-installer %I $TERM

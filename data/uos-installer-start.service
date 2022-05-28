@@ -1,5 +1,6 @@
 [Unit]
 Description=launch installer
+After=NetworkManager.service getty-pre.target getty@tty1.service
 
 [Service]
 Type=forking
