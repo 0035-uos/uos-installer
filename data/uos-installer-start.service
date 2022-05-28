@@ -1,0 +1,9 @@
+[Unit]
+Description=launch installer
+
+[Service]
+Type=forking
+ExecStart=/bin/bash /usr/bin/installer-start
+User=root
+[Install]
+WantedBy=basic.target
