@@ -2,6 +2,10 @@
 #include "gjsonitem.h"
 #include "gsysinfo.h"
 #include "parameter.h"
+#include "protocol/serverstate.h"
+#include "userinput.h"
+
+#include <QDebug>
 
 #include <iostream>
 
@@ -18,11 +22,14 @@ void SystemInfoConfig::run()
 {
     // 这里可以增加用户自定义设置
     {
+        QString username  = getusername();
+        QString password  = getpassword();
+
         GJsonItem user_item;
-        user_item.appendValue("username", "deepin");
-        user_item.appendValue("password", "deepin12!");
-        user_item.appendValue("rootpassword", "deepin12!");
-        user_item.appendValue("hostname", "deepin-pc");
+        user_item.appendValue("username", username);
+        user_item.appendValue("password", password);
+        user_item.appendValue("rootpassword", password);
+        user_item.appendValue("hostname", username + "-pc");
         m_data->appendItem("user", &user_item);
     }
     {
@@ -58,4 +65,37 @@ void SystemInfoConfig::cleanData()
 GJson *SystemInfoConfig::data()
 {
     return m_data;
+}
+
+QString SystemInfoConfig::getusername()
+{
+    QString outResout;
+    UserInput::ReadInput(outResout, std::bind(&SystemInfoConfig::usernameCheck, this, std::placeholders::_1), tr("please input username"));
+    return outResout;
+}
+
+QString SystemInfoConfig::getpassword()
+{
+    QString outResout;
+    UserInput::ReadInput(outResout, std::bind(&SystemInfoConfig::passwordCheck, this, std::placeholders::_1), tr("please input password"));
+    return outResout;
+}
+
+bool SystemInfoConfig::usernameCheck(const QString &username)
+{
+    static QStringList ignore = ServerState::Instance()->getIgnoreUsername().split(":", QString::SkipEmptyParts);
+    if (ignore.contains(username)) {
+        std::cout << tr("The user name already exitsts").toStdString() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+bool SystemInfoConfig::passwordCheck(const QString &password)
+{
+    if (password.length() < 2) {
+        std::cout << tr("Please enter a longer passwrod").toStdString() << std::endl;
+        return false;
+    }
+    return  true;
 }

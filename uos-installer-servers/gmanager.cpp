@@ -8,6 +8,7 @@
 #include "utils/utils.h"
 #include "protocol/serverstate.h"
 
+#include <QProcess>
 #include <QThread>
 #include <QDebug>
 #include <QTimer>
@@ -22,6 +23,7 @@ GManager::GManager(QObject *parent) : QObject(parent)
     initBoot();
     checkEfi();
     readMemInfo();
+    readExitUser();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
@@ -152,6 +154,50 @@ bool GManager::readMemInfo()
     ServerState::Instance()->setMemTotal(hash.value("MemTotal"));
     ServerState::Instance()->setSwapFree(hash.value("SwapFree"));
     ServerState::Instance()->setSwapTotal(hash.value("SwapTotal"));
+    return true;
+}
+
+bool GManager::readExitUser()
+{
+    static auto readValidUsername = [=](const QString& fn) -> QStringList {
+        QStringList res;
+        QFile file(fn);
+        if (!(file.open(QFile::ReadOnly))) {
+            return res;
+        }
+        QString line;
+        QStringList list;
+        while (!(file.atEnd())) {
+            line = file.readLine().trimmed();
+            list = line.split(":", QString::SkipEmptyParts);
+            if (list.length() > 2) {
+                res << list.at(0);
+            }
+        }
+        return res;
+    };
+    static auto readIgnoreUsername = [=](const QString& fn) -> QStringList {
+        QStringList res;
+        QFile file(fn);
+        if (!(file.open(QFile::ReadOnly))) {
+            return res;
+        }
+        QString line;
+        while (!(file.atEnd())) {
+            line = file.readLine().trimmed();
+            if (!(line.isEmpty())) {
+                res << line;
+            }
+        }
+        return res;
+    };
+    QStringList user  = readValidUsername("/etc/passwd");
+    QStringList group = readValidUsername("/etc/group");
+    QStringList ignore = readIgnoreUsername(Tools::ignore_username);
+    user += group;
+    user += ignore;
+    user = user.toSet().toList();
+    ServerState::Instance()->setIgnoreUsername(user.join(":"));
     return true;
 }
 

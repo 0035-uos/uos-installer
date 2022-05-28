@@ -215,4 +215,14 @@ void ServerState::setSwapTotal(const qint64 &value)
     swapTotal = value;
 }
 
+QString ServerState::getIgnoreUsername() const
+{
+    return ignoreUsername;
+}
+
+void ServerState::setIgnoreUsername(const QString &value)
+{
+    ignoreUsername = value;
+}
+
 

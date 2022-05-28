@@ -15,9 +15,12 @@ public:
     void run();
     void cleanData();
     GJson* data();
-signals:
 
-public slots:
+private:
+    QString getusername();
+    QString getpassword();
+    bool usernameCheck(const QString& username);
+    bool passwordCheck(const QString& password);
 
 private:
     GSysInfo* m_data;

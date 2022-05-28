@@ -32,6 +32,7 @@ class ServerState : public PropertyReflection, public Singleton<ServerState>
     Q_PROPERTY(qint64 swap_free READ getSwapFree WRITE setSwapFree)
     Q_PROPERTY(qint64 swap_total READ getSwapTotal WRITE setSwapTotal)
 
+    Q_PROPERTY(QString ignoreUsername READ getIgnoreUsername WRITE setIgnoreUsername)
 public:
     explicit ServerState(QObject *parent = nullptr);
 
@@ -100,6 +101,9 @@ public:
     qint64 getSwapTotal() const;
     void setSwapTotal(const qint64 &value);
 
+    QString getIgnoreUsername() const;
+    void setIgnoreUsername(const QString &value);
+
 private:
     int  state;
     bool loadPackagesDefault;
@@ -128,6 +132,8 @@ private:
     qint64 memTotal;
     qint64 swapFree;
     qint64 swapTotal;
+
+    QString ignoreUsername;
 };
 
 #endif // SERVERSTATE_H

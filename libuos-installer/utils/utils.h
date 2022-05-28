@@ -14,6 +14,7 @@ static const QString component_path = "/uos-installer/package.list";
 static const QString packages_default = "/usr/share/uos-installer/packages_default.json";
 //static const QString packages_default = "/home/deepin/uos-installer/packages_default.json";
 
+static const QString ignore_username = "/usr/share/uos-installer/username.ignore";
 
 static const qint64 TByte = 1024*1024*1024*1024L;
 static const qint64 GByte = 1024*1024*1024L;
