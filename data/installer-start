@@ -31,5 +31,5 @@ if [ "$(get_cmd install-mode)" = gui ]; then
 else 
     chvt 2
     systemctl stop getty@tty2
-    systemctl start installer-cli@tty2
+    systemctl start uos-installer-cli@tty2
 fi
