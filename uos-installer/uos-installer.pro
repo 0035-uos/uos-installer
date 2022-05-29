@@ -14,6 +14,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
+#DEFINES += DEEEPIN_PW_CHECK
+CONFIG(DEEEPIN_PW_CHECK) {
+    message("enable deepin-pw-check")
+    LIBS += -ldeepin_pw_check
+} else {
+    message("disable deepin-pw-check")
+}
+
 SOURCES += \
         main.cpp \
     parameter.cpp \

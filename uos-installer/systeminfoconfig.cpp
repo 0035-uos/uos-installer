@@ -4,7 +4,9 @@
 #include "parameter.h"
 #include "protocol/serverstate.h"
 #include "userinput.h"
-
+#ifdef DEEEPIN_PW_CHECK
+#include "deepin_pw_check.h"
+#endif
 #include <QDebug>
 
 #include <iostream>
@@ -93,9 +95,13 @@ bool SystemInfoConfig::usernameCheck(const QString &username)
 
 bool SystemInfoConfig::passwordCheck(const QString &password)
 {
+#ifdef DEEEPIN_PW_CHECK
+    // 这里可以调用dde-pw-check检查，使用dde-pw-check要记得添加依赖
     if (password.length() < 2) {
         std::cout << tr("Please enter a longer passwrod").toStdString() << std::endl;
         return false;
     }
+#else
+#endif
     return  true;
 }

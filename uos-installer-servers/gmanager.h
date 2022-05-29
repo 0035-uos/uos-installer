@@ -36,6 +36,7 @@ private:
     bool checkEfi();
     bool readMemInfo();
     bool readExitUser();
+    bool readPwConf();
 private:
 
     QMap<QString, JobItem> m_jobMap;

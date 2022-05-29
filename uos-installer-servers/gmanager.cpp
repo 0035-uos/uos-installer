@@ -12,6 +12,7 @@
 #include <QThread>
 #include <QDebug>
 #include <QTimer>
+#include <QSettings>
 #include <QCoreApplication>
 #include <QFileInfo>
 #include <QDir>
@@ -24,6 +25,7 @@ GManager::GManager(QObject *parent) : QObject(parent)
     checkEfi();
     readMemInfo();
     readExitUser();
+    readPwConf();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
 }
@@ -198,6 +200,32 @@ bool GManager::readExitUser()
     user += ignore;
     user = user.toSet().toList();
     ServerState::Instance()->setIgnoreUsername(user.join(":"));
+    return true;
+}
+
+bool GManager::readPwConf()
+{
+    if (!(QFileInfo(Tools::password_conf_file).exists())) {
+        ServerState::Instance()->setDdePwCheckFileExists(false);
+        return false;
+    }
+    ServerState::Instance()->setDdePwCheckFileExists(true);
+    QString default_validate_policy("1234567890;abcdefghijklmnopqrstuvwxyz;ABCDEFGHIJKLMNOPQRSTUVWXYZ;~`!@#$%^&*()-_+=|\\{}[]:\"'<>,.?/");
+    QSettings set(Tools::password_conf_file, QSettings::IniFormat);
+    set.beginGroup("Password");
+
+    ServerState::Instance()->setPwEnabled(set.value("STRONG_PASSWORD", true).toBool());
+    ServerState::Instance()->setPwMinLength(set.value("PASSWORD_MIN_LENGTH", 1).toInt());
+    ServerState::Instance()->setPwMaxLength(set.value("PASSWORD_MAX_LENGTH", 512).toInt());
+    ServerState::Instance()->setPwCharacterType(set.value("VALIDATE_POLICY", default_validate_policy).toString());
+    ServerState::Instance()->setPwCharacterNumRequired(set.value("VALIDATE_REQUIRED", 1).toInt());
+    ServerState::Instance()->setPwPalindromeMinNum(set.value("PALINDROME_NUM", 1).toInt());
+    ServerState::Instance()->setPwCheckWord(set.value("WORD_CHECK", 0).toInt());
+    ServerState::Instance()->setPwDictPath(set.value("DICT_PATH", "").toString());
+    ServerState::Instance()->setPwMonotoneCharacterNum(set.value("MONOTONE_CHARACTER_NUM", 0).toInt());
+    ServerState::Instance()->setPwConsecutiveSameCharacterNum(set.value("CONSECUTIVE_SAME_CHARACTER_NUM", 0).toInt());
+    ServerState::Instance()->setPwFirstLetterUppercase(set.value("FIRST_LETTER_UPPERCASE", 0).toInt());
+    set.endGroup();
     return true;
 }
 

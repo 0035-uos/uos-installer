@@ -113,7 +113,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         GComponentManager::Instance()->exportfile("./component.json");
         QStringList componentList = GComponentManager::Instance()->componentList();
         if (componentList.count() <= 0) {
-            qInfo() << tr("not found valid component");
+            qCritical() << tr("not found valid component");
             qApp->exit(1);
         }
         int outIndex;
@@ -125,7 +125,7 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         QJsonArray array = info.object().value("devices").toArray();
         QStringList devlist, devdesc;
         if (array.count() <= 0) {
-            qInfo() << tr("not found valid devices");
+            qCritical() << tr("not found valid devices");
             qApp->exit(1);
         }
 

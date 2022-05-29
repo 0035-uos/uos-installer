@@ -225,4 +225,124 @@ void ServerState::setIgnoreUsername(const QString &value)
     ignoreUsername = value;
 }
 
+bool ServerState::getDdePwCheckFileExists() const
+{
+    return ddePwCheckFileExists;
+}
+
+void ServerState::setDdePwCheckFileExists(bool value)
+{
+    ddePwCheckFileExists = value;
+}
+
+bool ServerState::getPwEnabled() const
+{
+    return pwEnabled;
+}
+
+void ServerState::setPwEnabled(bool value)
+{
+    pwEnabled = value;
+}
+
+int ServerState::getPwMaxLength() const
+{
+    return pwMaxLength;
+}
+
+void ServerState::setPwMaxLength(int value)
+{
+    pwMaxLength = value;
+}
+
+int ServerState::getPwMinLength() const
+{
+    return pwMinLength;
+}
+
+void ServerState::setPwMinLength(int value)
+{
+    pwMinLength = value;
+}
+
+QString ServerState::getPwCharacterType() const
+{
+    return pwCharacterType;
+}
+
+void ServerState::setPwCharacterType(const QString &value)
+{
+    pwCharacterType = value;
+}
+
+int ServerState::getPwCharacterNumRequired() const
+{
+    return pwCharacterNumRequired;
+}
+
+void ServerState::setPwCharacterNumRequired(int value)
+{
+    pwCharacterNumRequired = value;
+}
+
+int ServerState::getPwPalindromeMinNum() const
+{
+    return pwPalindromeMinNum;
+}
+
+void ServerState::setPwPalindromeMinNum(int value)
+{
+    pwPalindromeMinNum = value;
+}
+
+QString ServerState::getPwDictPath() const
+{
+    return pwDictPath;
+}
+
+void ServerState::setPwDictPath(QString value)
+{
+    pwDictPath = value;
+}
+
+int ServerState::getPwCheckWord() const
+{
+    return pwCheckWord;
+}
+
+void ServerState::setPwCheckWord(int value)
+{
+    pwCheckWord = value;
+}
+
+bool ServerState::getPwFirstLetterUppercase() const
+{
+    return pwFirstLetterUppercase;
+}
+
+void ServerState::setPwFirstLetterUppercase(bool value)
+{
+    pwFirstLetterUppercase = value;
+}
+
+int ServerState::getPwMonotoneCharacterNum() const
+{
+    return pwMonotoneCharacterNum;
+}
+
+void ServerState::setPwMonotoneCharacterNum(int value)
+{
+    pwMonotoneCharacterNum = value;
+}
+
+int ServerState::getPwConsecutiveSameCharacterNum() const
+{
+    return pwConsecutiveSameCharacterNum;
+}
+
+void ServerState::setPwConsecutiveSameCharacterNum(int value)
+{
+    pwConsecutiveSameCharacterNum = value;
+}
+
 

@@ -16,6 +16,8 @@ static const QString packages_default = "/usr/share/uos-installer/packages_defau
 
 static const QString ignore_username = "/usr/share/uos-installer/username.ignore";
 
+static const QString password_conf_file = "/etc/deepin/dde.conf";
+
 static const qint64 TByte = 1024*1024*1024*1024L;
 static const qint64 GByte = 1024*1024*1024L;
 static const qint64 MByte = 1024*1024L;

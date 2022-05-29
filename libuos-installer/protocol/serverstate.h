@@ -33,6 +33,19 @@ class ServerState : public PropertyReflection, public Singleton<ServerState>
     Q_PROPERTY(qint64 swap_total READ getSwapTotal WRITE setSwapTotal)
 
     Q_PROPERTY(QString ignoreUsername READ getIgnoreUsername WRITE setIgnoreUsername)
+
+    Q_PROPERTY(bool ddePwCheckFileExists READ getDdePwCheckFileExists WRITE setDdePwCheckFileExists)
+    Q_PROPERTY(bool pwEnabled READ getPwEnabled WRITE setPwEnabled)
+    Q_PROPERTY(int pwMaxLength READ getPwMaxLength WRITE setPwMaxLength)
+    Q_PROPERTY(int pwMinLength READ getPwMinLength WRITE setPwMinLength)
+    Q_PROPERTY(QString pwCharacterType READ getPwCharacterType WRITE setPwCharacterType)
+    Q_PROPERTY(int pwCharacterNumRequired READ getPwCharacterNumRequired WRITE setPwCharacterNumRequired)
+    Q_PROPERTY(int pwPalindromeMinNum READ getPwPalindromeMinNum WRITE setPwPalindromeMinNum)
+    Q_PROPERTY(QString pwDictPath READ getPwDictPath WRITE setPwDictPath)
+    Q_PROPERTY(int pwCheckWord READ getPwCheckWord WRITE setPwCheckWord)
+    Q_PROPERTY(bool pwFirstLetterUppercase READ getPwFirstLetterUppercase WRITE setPwFirstLetterUppercase)
+    Q_PROPERTY(int pwMonotoneCharacterNum READ getPwMonotoneCharacterNum WRITE setPwMonotoneCharacterNum)
+    Q_PROPERTY(int pwConsecutiveSameCharacterNum READ getPwConsecutiveSameCharacterNum WRITE setPwConsecutiveSameCharacterNum)
 public:
     explicit ServerState(QObject *parent = nullptr);
 
@@ -104,6 +117,42 @@ public:
     QString getIgnoreUsername() const;
     void setIgnoreUsername(const QString &value);
 
+    bool getDdePwCheckFileExists() const;
+    void setDdePwCheckFileExists(bool value);
+
+    bool getPwEnabled() const;
+    void setPwEnabled(bool value);
+
+    int getPwMaxLength() const;
+    void setPwMaxLength(int value);
+
+    int getPwMinLength() const;
+    void setPwMinLength(int value);
+
+    QString getPwCharacterType() const;
+    void setPwCharacterType(const QString &value);
+
+    int getPwCharacterNumRequired() const;
+    void setPwCharacterNumRequired(int value);
+
+    int getPwPalindromeMinNum() const;
+    void setPwPalindromeMinNum(int value);
+
+    QString getPwDictPath() const;
+    void setPwDictPath(QString value);
+
+    int getPwCheckWord() const;
+    void setPwCheckWord(int value);
+
+    bool getPwFirstLetterUppercase() const;
+    void setPwFirstLetterUppercase(bool value);
+
+    int getPwMonotoneCharacterNum() const;
+    void setPwMonotoneCharacterNum(int value);
+
+    int getPwConsecutiveSameCharacterNum() const;
+    void setPwConsecutiveSameCharacterNum(int value);
+
 private:
     int  state;
     bool loadPackagesDefault;
@@ -134,6 +183,20 @@ private:
     qint64 swapTotal;
 
     QString ignoreUsername;
+
+    // password
+    bool ddePwCheckFileExists;
+    bool pwEnabled; //
+    int pwMaxLength;
+    int pwMinLength;
+    QString pwCharacterType;  // 可选字符列表
+    int pwCharacterNumRequired; // 最少字符个数
+    int pwPalindromeMinNum; // 回文最小检测数
+    QString pwDictPath; //
+    int pwCheckWord; // 不太清楚这个配置： 感觉像是一些特殊单词的使用限制（配置为空）配合dictpath使用的
+    bool pwFirstLetterUppercase; // 首字母是否大写
+    int pwMonotoneCharacterNum;         // 单调字符个数
+    int pwConsecutiveSameCharacterNum; // 连续相似字符个数
 };
 
 #endif // SERVERSTATE_H
