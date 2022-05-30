@@ -32,7 +32,7 @@ void PartedConfig::run()
 
     DeviceInfo* dev = nullptr;
     for (const DeviceInfo* &info : m_devicelist) {
-        qInfo() << info->getPath() << info->getSectorSize() << info->getLength() << (1.0 * info->getSectorSize() * info->getLength()/GByte);
+        //qInfo() << info->getPath() << info->getSectorSize() << info->getLength() << (1.0 * info->getSectorSize() * info->getLength()/GByte);
         if (m_defaultDevicePath == info->getPath()) {
             dev = const_cast<DeviceInfo*>(info);
             break;
@@ -45,7 +45,7 @@ void PartedConfig::run()
     }
     // 默认分区方案
 
-    qint64 dev_size = dev->getSectorSize() * dev->getLength()/GByte;
+    //qint64 dev_size = dev->getSectorSize() * dev->getLength()/GByte;
 
     // check dev_size
 

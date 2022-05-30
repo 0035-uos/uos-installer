@@ -15,7 +15,7 @@ public:
 
     void waitFinished();
 signals:
-    void finished();
+    void finished(const QString& cmd, const QByteArray &data);
 
 public slots:
     void startRun(const QString& cmd, const QStringList &args);
@@ -26,6 +26,8 @@ private:
     int asyncThread(int timeout);
     void runScripts();
     void run();
+
+private:
 private:
     std::future<int> m_future;
     QProcess m_process;

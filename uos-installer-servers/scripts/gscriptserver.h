@@ -21,6 +21,7 @@ signals:
 
 public slots:
     void start(const QByteArray &cmd, const QByteArray &parameter);
+    void finished(const QString& cmd, const QByteArray &data);
 
 
 private:

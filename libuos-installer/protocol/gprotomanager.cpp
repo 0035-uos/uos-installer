@@ -28,6 +28,7 @@ void GProtoManager::parseDataFrame()
 
 
     while (m_bufferArray.length() > min_len) {
+        frame.clear();
         ret = GProtocol::getDataFromFrame(proto_begin, proto_end, m_bufferArray, frame);
         switch (ret) {
         case 0:

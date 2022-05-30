@@ -10,6 +10,7 @@
 
 
 void test_1();
+void test_2();
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +18,8 @@ int main(int argc, char *argv[])
 
 //    return a.exec();
 
-    test_1();
+//    test_1();
+    test_2();
     return 0;
 
 
@@ -417,5 +419,7 @@ bool ReadUsage(const QString& partition_path,
 }
 
 */
-
+void test_2() {
+    int n = 100;
+}
 

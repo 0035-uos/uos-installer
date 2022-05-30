@@ -45,6 +45,7 @@ bool UserInput::UserSelect(int &outIndex, QString &outResult, const QStringList 
                 outIndex = target.indexOf(result);
             } else if (mustSuccess) {
                 exit = true;
+                std::cout << tr("Please enter a valid option").toStdString() << std::endl;
             } else {
                 return false;
             }

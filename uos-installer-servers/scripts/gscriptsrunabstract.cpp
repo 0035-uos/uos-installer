@@ -1,12 +1,18 @@
 #include "gscriptsrunabstract.h"
 
+#include <QTextCodec>
 #include <QThread>
 #include <QDebug>
 
+static QTextCodec* codec_system = QTextCodec::codecForName("System");
+#define PRINT_INFO(x) (codec_system ? codec_system->toUnicode(x) : x)
 
 GScriptsRunAbstract::GScriptsRunAbstract(QObject *parent) :
     QObject(parent)
 {
+    if (!codec_system) {
+        codec_system = QTextCodec::codecForName("UTF-8");
+    }
 }
 
 void GScriptsRunAbstract::waitFinished()
@@ -35,28 +41,28 @@ int GScriptsRunAbstract::asyncThread(int timeout)
           [process](int, QProcess::ExitStatus){
         QByteArray an = process->readAllStandardOutput();
         if (!an.isEmpty())
-            qInfo() << an;
+            qInfo() << PRINT_INFO(an);
         process->deleteLater();
     });
     connect(process, &QProcess::started, this, []{
         qInfo() << "start install";
     });
     connect(process, &QProcess::readyReadStandardOutput, this, [process]{
-        qWarning() << process->readAllStandardOutput();
+        qInfo() << PRINT_INFO(process->readAllStandardOutput());
     });
     connect(process, &QProcess::readyReadStandardError, this, [process]{
-        qWarning() << process->readAllStandardError();
+        qWarning() << PRINT_INFO(process->readAllStandardError());
     });
     process->start(m_command, m_args);
 
     process->waitForStarted(3000);
-    process->waitForFinished(timeout);
-    emit finished();
+    bool ret = process->waitForFinished(timeout);
+    emit finished(m_command, QString("{return:%1}").arg(ret?"true":"false").toLocal8Bit());
     return 0;
 }
 
 void GScriptsRunAbstract::run()
 {
-
     m_quit = true;
 }
+

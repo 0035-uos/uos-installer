@@ -26,6 +26,8 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_registerFunction[cmd_exit_server] = std::bind(&GScriptServer::onExit, this, std::placeholders::_1);
     m_registerFunction[cmd_set_component] = std::bind(&GScriptServer::onSetComponent, this, std::placeholders::_1);
     m_registerFunction[cmd_get_component] = std::bind(&GScriptServer::onGetComponent, this, std::placeholders::_1);
+
+    connect(m_script, &GScriptsRunAbstract::finished, this, &GScriptServer::finished);
 }
 
 void GScriptServer::start(const QByteArray &cmd, const QByteArray &parameter)
@@ -33,6 +35,14 @@ void GScriptServer::start(const QByteArray &cmd, const QByteArray &parameter)
     if (m_registerFunction.contains(cmd)) {
         m_registerFunction.value(cmd)(parameter);
     }
+}
+
+void GScriptServer::finished(const QString &cmd, const QByteArray &data)
+{
+    Q_UNUSED(cmd)
+    Q_UNUSED(data)
+    GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
+    sigSend(GProtocol::getNotifyFrame(info2.data()));
 }
 
 void GScriptServer::onGetDevices(const QByteArray &data)
@@ -129,11 +139,6 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     sigSend(GProtocol::getNotifyFrame(info1.data()));
 
     m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh << ServerState::Instance()->getDevicePath());
-
-    m_script->waitFinished();
-    qInfo() << "finished";
-    GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
-    sigSend(GProtocol::getNotifyFrame(info2.data()));
 }
 
 
