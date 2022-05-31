@@ -1,0 +1,6 @@
+libuos-installer/*.h /usr/include/libuos-installer/
+libuos-installer/communication/*.h /usr/include/libuos-installer/communication/
+libuos-installer/log/*.h /usr/include/libuos-installer/log/
+libuos-installer/protocol/*.h /usr/include/libuos-installer/protocol/
+libuos-installer/utils/*.h /usr/include/libuos-installer/utils/
+libuos-installer/libuos-installer.a /usr/lib/uos-installer/

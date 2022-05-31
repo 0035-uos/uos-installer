@@ -1,0 +1,35 @@
+#!/bin/bash
+extractpr() {
+  data_in="$(cat)"
+  tag="$1"
+  # Standard regex matcher to extract the value for a given tag
+  m_matcher="([a-zA-Z0-9/\\@#\$%^&\!*\(\)'\"=:,._-]+)"
+  # Regex matcher for values that are quoted
+  q_matcher="\"([a-zA-Z0-9/\\@#\$%^&\!*\(\)',=: ._-]+)\""
+  [ $# -gt 1 ] && m_matcher="$2" && q_matcher="$2"
+  k_res="$(printf '%s' "$data_in" | sed -rn "s/.* ?${tag}=${m_matcher} ?(.*)+?/\1/p")"
+  if echo "$k_res" | grep -Eq '^"'; then
+    k_res="$(printf "%s\n" "$data_in" | sed -rn "s/.* ?${tag}=${q_matcher} ?(.*)+?/\1/p")"
+  fi
+  printf "%s\n" "$k_res"
+}
+
+get_cmd() {
+  res=$(cat /proc/cmdline | extractpr "$@")
+  if [ -z "$res" ]; then
+    return 1
+  else
+    printf "%s\n" "$res"
+  fi
+}
+
+systemctl start uos-installer-server
+sleep 5
+
+if [ "$(get_cmd install-mode)" = gui ]; then
+    systemctl start installer-gui
+else 
+    chvt 2
+    systemctl stop getty@tty2
+    systemctl start uos-installer-cli@tty2
+fi

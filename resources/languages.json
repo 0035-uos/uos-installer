@@ -1,0 +1,14 @@
+[
+  {
+    "name": "English",
+    "local_name": "English",
+    "locale": "en_US",
+    "timezone": ""
+  },
+  {
+    "name": "Chinese (China)",
+    "local_name": "简体中文",
+    "locale": "zh_CN",
+    "timezone": "Asia/Shanghai"
+  }
+]

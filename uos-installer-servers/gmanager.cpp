@@ -1,0 +1,238 @@
+#include "gmanager.h"
+
+#include "communication/gcommserver.h"
+#include "scripts/gscriptserver.h"
+#include "protocol/gprotomanager.h"
+#include "gheartbeatthread.h"
+#include "gcomponentmanager.h"
+#include "utils/utils.h"
+#include "protocol/serverstate.h"
+
+#include <QProcess>
+#include <QThread>
+#include <QDebug>
+#include <QTimer>
+#include <QSettings>
+#include <QCoreApplication>
+#include <QFileInfo>
+#include <QDir>
+
+static const QString memInfoFile = "/proc/meminfo";
+
+GManager::GManager(QObject *parent) : QObject(parent)
+{
+    initBoot();
+    checkEfi();
+    readMemInfo();
+    readExitUser();
+    readPwConf();
+    GComponentManager::Instance()->loadfile(Tools::packages_default);
+    ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
+    ServerState::Instance()->setState(SERVER_STATE_IDLE);
+}
+
+GManager::~GManager()
+{
+}
+
+void GManager::init()
+{
+    initCommunication();
+    initInstaller();
+
+    connect(GHeartBeatThread::Instance(), &GHeartBeatThread::sigSend, this, &GManager::sendData);
+    appendJob("heartbeat", GHeartBeatThread::Instance());
+    QTimer::singleShot(200, this, []{
+        GHeartBeatThread::Instance()->sigStartHeartBeat(2000);
+    });
+}
+
+void GManager::onExitServer()
+{
+    GHeartBeatThread::Instance()->setExit(true);
+    QMap<QString, JobItem>::const_iterator it = m_jobMap.constBegin();
+    for (; it != m_jobMap.constEnd(); it++) {
+        qInfo() << "waiting" << it.key() << "exit";
+        it.value().thread->quit();
+        it.value().thread->wait(10000);
+        qInfo() << it.key() << "exit:" << !(it.value().thread->isRunning());
+    }
+    qApp->exit();
+}
+
+void GManager::initCommunication()
+{
+    GCommServer *comm = GCommServer::Instance();
+    connect(this, &GManager::sigStartCommunication, comm, &GCommServer::start);
+    connect(this, &GManager::sendData, comm, &GCommServer::sendData);
+    appendJob("communication", comm);
+}
+
+void GManager::initInstaller()
+{
+    GScriptServer* script = GScriptServer::Instance();
+    connect(GProtoManager::Instance(), &GProtoManager::newFrame, script, &GScriptServer::start);
+    connect(script, &GScriptServer::sigSend, this, &GManager::sendData);
+    connect(script, &GScriptServer::sigExitServer, this, &GManager::onExitServer);
+    appendJob("script", script);
+}
+
+void GManager::appendJob(const QString &key, QObject *object)
+{
+    QThread *thread = new QThread;
+    object->moveToThread(thread);
+    m_jobMap[key] = {thread, object};
+    thread->start();
+}
+
+bool GManager::initBoot()
+{
+    QFile file("/proc/cmdline");
+    ServerState::Instance()->setBootValid(false);
+    if (file.exists() && file.open(QFile::ReadOnly)) {
+        QByteArray cmdline = file.readAll();
+        file.close();
+        if (cmdline.contains("boot=casper")) {
+            ServerState::Instance()->setBootValid(true);
+            ServerState::Instance()->setBoot("casper");
+            ServerState::Instance()->setCdrom("/cdrom");
+            ServerState::Instance()->setLupinRoot("/isodevice");
+            ServerState::Instance()->setDistribution("ubuntu");
+        } else if (cmdline.contains("boot=live")) {
+            ServerState::Instance()->setBootValid(true);
+            ServerState::Instance()->setBoot("live");
+            if (QDir("/lib/live/mount/medium/live").exists()) {
+                ServerState::Instance()->setCdrom("/lib/live/mount/medium");
+            } else {
+                ServerState::Instance()->setCdrom("/run/live/medium");
+            }
+            ServerState::Instance()->setLupinRoot("/lib/live/mount/findiso");
+            ServerState::Instance()->setDistribution("debian");
+        } else {
+            ServerState::Instance()->setBootValid(false);
+        }
+        if (ServerState::Instance()->getBootValid()) {
+            ServerState::Instance()->setLiveFileSystem(ServerState::Instance()->getCdrom()+"/"+ServerState::Instance()->getBoot());
+            ServerState::Instance()->setLive(ServerState::Instance()->getBoot());
+        }
+    }
+    return false;
+}
+
+bool GManager::checkEfi()
+{
+    ServerState::Instance()->setEfi(false);
+    if (QFileInfo::exists("/sys/firmware/efi") || Tools::is_sw()) {
+        ServerState::Instance()->setEfi(true);
+    }
+    return true;
+}
+
+bool GManager::readMemInfo()
+{
+    const QString content = Tools::ReadFile(memInfoFile);
+    if (content.isEmpty()) {
+        qWarning() << "Failed to read meminfo!";
+        return false;
+    }
+
+    QHash<QString, qint64> hash;
+    for (const QString& line : content.split('\n')) {
+        const int index = line.indexOf(':');
+        if (index > -1) {
+            QString str_value = line.mid(index + 1);
+            str_value.remove("kB");
+            str_value = str_value.trimmed();
+            // Convert kB to byte.
+            const qint64 value = str_value.toLongLong() * 1024;
+            hash.insert(line.left(index), value);
+            //qInfo() << line.left(index) << value;
+        }
+    }
+
+    ServerState::Instance()->setBuffers(hash.value("Buffers"));
+    ServerState::Instance()->setCached(hash.value("Cached"));
+    ServerState::Instance()->setMemAvailable(hash.value("MemAvailable"));
+    ServerState::Instance()->setMemFree(hash.value("MemFree"));
+    ServerState::Instance()->setMemTotal(hash.value("MemTotal"));
+    ServerState::Instance()->setSwapFree(hash.value("SwapFree"));
+    ServerState::Instance()->setSwapTotal(hash.value("SwapTotal"));
+    return true;
+}
+
+bool GManager::readExitUser()
+{
+    static auto readValidUsername = [=](const QString& fn) -> QStringList {
+        QStringList res;
+        QFile file(fn);
+        if (!(file.open(QFile::ReadOnly))) {
+            return res;
+        }
+        QString line;
+        QStringList list;
+        while (!(file.atEnd())) {
+            line = file.readLine().trimmed();
+            list = line.split(":", QString::SkipEmptyParts);
+            if (list.length() > 2) {
+                res << list.at(0);
+            }
+        }
+        return res;
+    };
+    static auto readIgnoreUsername = [=](const QString& fn) -> QStringList {
+        QStringList res;
+        QFile file(fn);
+        if (!(file.open(QFile::ReadOnly))) {
+            return res;
+        }
+        QString line;
+        while (!(file.atEnd())) {
+            line = file.readLine().trimmed();
+            if (!(line.isEmpty())) {
+                res << line;
+            }
+        }
+        return res;
+    };
+    QStringList user  = readValidUsername("/etc/passwd");
+    QStringList group = readValidUsername("/etc/group");
+    QStringList ignore = readIgnoreUsername(Tools::ignore_username);
+    user += group;
+    user += ignore;
+    user = user.toSet().toList();
+    ServerState::Instance()->setIgnoreUsername(user.join(":"));
+    return true;
+}
+
+bool GManager::readPwConf()
+{
+    if (!(QFileInfo(Tools::password_conf_file).exists())) {
+        ServerState::Instance()->setDdePwCheckFileExists(false);
+        return false;
+    }
+    ServerState::Instance()->setDdePwCheckFileExists(true);
+    QString default_validate_policy("1234567890;abcdefghijklmnopqrstuvwxyz;ABCDEFGHIJKLMNOPQRSTUVWXYZ;~`!@#$%^&*()-_+=|\\{}[]:\"'<>,.?/");
+    QSettings set(Tools::password_conf_file, QSettings::IniFormat);
+    set.beginGroup("Password");
+
+    ServerState::Instance()->setPwEnabled(set.value("STRONG_PASSWORD", true).toBool());
+    ServerState::Instance()->setPwMinLength(set.value("PASSWORD_MIN_LENGTH", 1).toInt());
+    ServerState::Instance()->setPwMaxLength(set.value("PASSWORD_MAX_LENGTH", 512).toInt());
+    ServerState::Instance()->setPwCharacterType(set.value("VALIDATE_POLICY", default_validate_policy).toString());
+    ServerState::Instance()->setPwCharacterNumRequired(set.value("VALIDATE_REQUIRED", 1).toInt());
+    ServerState::Instance()->setPwPalindromeMinNum(set.value("PALINDROME_NUM", 1).toInt());
+    ServerState::Instance()->setPwCheckWord(set.value("WORD_CHECK", 0).toInt());
+    ServerState::Instance()->setPwDictPath(set.value("DICT_PATH", "").toString());
+    ServerState::Instance()->setPwMonotoneCharacterNum(set.value("MONOTONE_CHARACTER_NUM", 0).toInt());
+    ServerState::Instance()->setPwConsecutiveSameCharacterNum(set.value("CONSECUTIVE_SAME_CHARACTER_NUM", 0).toInt());
+    ServerState::Instance()->setPwFirstLetterUppercase(set.value("FIRST_LETTER_UPPERCASE", 0).toInt());
+    set.endGroup();
+    return true;
+}
+
+
+
+
+
+
+
