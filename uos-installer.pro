@@ -6,5 +6,7 @@ SUBDIRS += \
     libuos-installer \
     uos-installer-servers \
     auto-parted \
-    uos-installer
+    uos-installer \
+    uos-installer-widget \
+    DevelopTools
 

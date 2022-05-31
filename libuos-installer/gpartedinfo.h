@@ -20,22 +20,14 @@
 *
 */
 
-#include "gjson.h"
+#include "garrayjson.h"
 
-#include <QJsonArray>
-
-class GJsonItem;
-class GPartedInfo : public GJson
+class GPartedInfo : public GArrayJson
 {
 public:
     explicit GPartedInfo(const QString& filename = QString());
     ~GPartedInfo();
 
-    bool commitData();
-    void appendItem(GJsonItem* item);
-
-private:
-    QJsonArray m_info;
 };
 
 #endif // GPARTEDINFO_H

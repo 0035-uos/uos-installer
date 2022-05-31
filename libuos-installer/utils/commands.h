@@ -26,6 +26,10 @@ static const QByteArray cmd_info_progress("CMD_INFO_PROGRESS");
 static const QByteArray cmd_exit_server("CMD_EXIT_SERVER");
 static const QByteArray cmd_set_component("CMD_SET_COMPONENT");
 static const QByteArray cmd_get_component("CMD_GET_COMPONENT");
+static const QByteArray cmd_get_log("CMD_GET_LOG");
+static const QByteArray cmd_get_xkblayout("CMD_GET_XKBLAYOUT");
+static const QByteArray cmd_get_language("CMD_GET_LANGUAGE");
+static const QByteArray cmd_get_timezone("CMD_GET_TIMEZONE");
 
 
 static const QByteArray cmd_notify_response("CMD_NOTIFY_RESPONSE");

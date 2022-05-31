@@ -30,7 +30,8 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
     udev,
     libqt5network5,
     libqt5core5a,
-    libqt5concurrent5
+    libqt5concurrent5,
+    libqt5xml5
 Description: server for uos-installer
  server for uos-installer
 

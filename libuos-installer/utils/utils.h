@@ -16,6 +16,14 @@ static const QString packages_default = "/usr/share/uos-installer/packages_defau
 
 static const QString ignore_username = "/usr/share/uos-installer/username.ignore";
 
+#ifdef QT_DEBUG
+static const QString installer_server_log_file = QString("/tmp/%1").arg("uos-installer-server.log");
+static const QString installer_log_file = QString("/tmp/%1").arg("uos-installer.log");
+#else
+static const QString installer_server_log_file = QString("/var/log/%1").arg(uos-installer-server.log);
+static const QString installer_log_file = QString("/var/log/%1").arg(uos-installer.log);
+#endif
+
 static const QString password_conf_file = "/etc/deepin/dde.conf";
 
 static const qint64 TByte = 1024*1024*1024*1024L;
@@ -29,6 +37,7 @@ QString scanValidFileName(const QString& path, const QString& basename);
 
 Installation installation();
 
+bool isLive();
 //!
 //! \brief getCurrentPlatform
 //! \return x86/sw/loongson/loongarch64/arm
@@ -41,6 +50,67 @@ bool is_loongarch64();
 
 
 QString ReadFile(const QString& path);
+bool WriteFile(const QString& path, const QByteArray& data);
+
+
+
+/// ==========================================================================================
+struct XkbModel {
+  QString name = "";
+  QString description = "";
+  QString vendor = "";
+};
+typedef QList<XkbModel> XkbModelList;
+
+struct XkbLayoutVariant {
+  QString name = "";
+  QString layout_name = "";
+  QString description = "";
+  QString short_description = "";
+  QStringList language_list;
+};
+typedef QList<XkbLayoutVariant> XKbLayoutVariantList;
+
+struct XkbLayout {
+  QString name = "";
+  QString description = "";
+  QString short_description = "";
+  QStringList language_list;
+  XKbLayoutVariantList variant_list;
+};
+typedef QList<XkbLayout> XkbLayoutList;
+
+struct XkbConfig {
+  XkbModelList model_list;
+  XkbLayoutList layout_list;
+};
+
+// Read system keyboard layout, with localized description.
+// |locale| is the desired locale name.
+XkbConfig GetXkbConfig();
+
+
+/// ==========================================================================================
+const QString languages_path("/usr/share/uos-installer/languages.json");
+
+/// ==========================================================================================
+struct ZoneInfo {
+ public:
+  QString country;
+  QString timezone;
+
+  // Coordinates of zone.
+  double latitude;
+  double longitude;
+
+  // Distance to clicked point for comparison.
+  double distance;
+};
+typedef QList<ZoneInfo> ZoneInfoList;
+
+double ConvertPos(const QString& pos, int digits);
+
+ZoneInfoList GetZoneInfoList();
 
 
 }

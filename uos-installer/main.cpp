@@ -9,6 +9,7 @@
 #include "gparteditem.h"
 #include "gsysinfo.h"
 #include "log/DLog"
+#include "utils/utils.h"
 #include "parameter.h"
 
 #include <QDebug>
@@ -22,17 +23,14 @@ int main(int argc, char *argv[])
     a.setObjectName("uos-installer");
 
     // Initialize log service.
-    const char kLogFileName[] = "uos-installer.log";
-    QString log_file;
-#ifdef QT_DEBUG
-    qCritical() << "Root privilege is required!";
-    log_file = QString("/tmp/%1").arg(kLogFileName);
-#else
-    log_file = QString("/var/log/%1").arg(kLogFileName);
-#endif
+    DLogManager::setLogFormat("%{time}{yyyy-MM-dd, HH:mm:ss.zzz} [%{type:-7}] "
+                              "[%{function:-35} %{line}] %{message}\n");
+    DLogManager::setlogFilePath(Tools::installer_log_file);
+    DLogManager::registerConsoleAppender();
+    DLogManager::registerFileAppender();
+
     if (argc > 1)
         Parameter::Instance()->parser();
-
 
     CommunicationInterface *socket = GLocalManager::Instance()->communication();
     socket->start();

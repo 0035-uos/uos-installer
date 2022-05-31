@@ -3,5 +3,6 @@ data/uos-installer-cli@.service  /usr/lib/systemd/system/
 data/uos-installer-server.service /usr/lib/systemd/system/
 data/uos-installer-start.service  /usr/lib/systemd/system/
 data/installer-start /usr/bin
-packages_default.json  /usr/share/uos-installer/
 hooks /usr/share/uos-installer/
+resources/packages_default.json  /usr/share/uos-installer/
+resources/languages.json /usr/share/uos-installer/

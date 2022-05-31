@@ -22,6 +22,30 @@ void SystemInfoConfig::initData()
 
 void SystemInfoConfig::run()
 {
+    { // test
+        int c1 = m_language.count();
+        for (int i = 0;i < c1; i++) {
+            qInfo() << i+1 << m_language.value(i).value("name") << m_language.value(i).value("locale") ;
+        }
+        qInfo() << "====================";
+        int c2 = m_timerzone.count();
+        for (int i = 0;i < c2; i++) {
+            //qInfo() << i+1 << m_timerzone.value(i).value("country") << m_timerzone.value(i).value("timezone");
+        }
+        qInfo() << "====================";
+        GArrayJson array;
+        qInfo() << m_xkblayout.valueArray("layout_list", array);
+        m_xkblayout.commitData();
+        int c3 = array.count();
+        for (int i = 0;i < c3; i++) {
+            qInfo() << i+1 << array.value(i).value("name") << array.value(i).value("description");
+            GArrayJson variantList(array.value(i).value("variantList").toLocal8Bit());
+            for (int j = 0; j < variantList.count(); j++) {
+                qInfo() << "\t" << variantList.value(j).value("name") << variantList.value(j).value("description");
+            }
+        }
+        qInfo() << "====================";
+    }
     // 这里可以增加用户自定义设置
     {
         QString username  = getusername();
@@ -95,6 +119,7 @@ bool SystemInfoConfig::usernameCheck(const QString &username)
 
 bool SystemInfoConfig::passwordCheck(const QString &password)
 {
+    Q_UNUSED(password)
 #ifdef DEEEPIN_PW_CHECK
     // 这里可以调用dde-pw-check检查，使用dde-pw-check要记得添加依赖
     if (password.length() < 2) {
@@ -104,4 +129,19 @@ bool SystemInfoConfig::passwordCheck(const QString &password)
 #else
 #endif
     return  true;
+}
+
+void SystemInfoConfig::setTimerzone(const GTimezone &timerzone)
+{
+    m_timerzone = timerzone;
+}
+
+void SystemInfoConfig::setXkblayout(const GXkbLayout &xkblayout)
+{
+    m_xkblayout = xkblayout;
+}
+
+void SystemInfoConfig::setLanguage(const GLanguageInfo &language)
+{
+    m_language = language;
 }

@@ -12,6 +12,7 @@ bool UserInput::UserSelect(int &outIndex, QString &outResult, const QStringList 
     if (target.length() <= 0) return false;
     QString default_result, result;
     bool exit = false;
+    fflush(stdout);
     do {
         exit = false;
         for (int i = 0; i < target.length(); i++) {
@@ -45,6 +46,7 @@ bool UserInput::UserSelect(int &outIndex, QString &outResult, const QStringList 
                 outIndex = target.indexOf(result);
             } else if (mustSuccess) {
                 exit = true;
+                fflush(stdout);
                 std::cout << tr("Please enter a valid option").toStdString() << std::endl;
             } else {
                 return false;
@@ -57,7 +59,7 @@ bool UserInput::UserSelect(int &outIndex, QString &outResult, const QStringList 
 bool UserInput::ReadInput(QString &outResult, std::function<bool (const QString &)> func, const QString &tipmsg)
 {
     QString result;
-
+    fflush(stdout);
     bool exit = false;
     do {
         exit = false;
@@ -71,6 +73,7 @@ bool UserInput::ReadInput(QString &outResult, std::function<bool (const QString 
             if (func(outResult)) {
             } else {
                 exit = true;
+                fflush(stdout);
             }
         }
     } while(exit);

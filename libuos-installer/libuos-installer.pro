@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network
+QT       += network xml
 
 QT       -= gui
 
@@ -43,7 +43,12 @@ SOURCES += \
     protocol/serverstate.cpp \
     gcomponentmanager.cpp \
     utils/deviceinfo.cpp \
-    utils/partitioninfo.cpp
+    utils/partitioninfo.cpp \
+    glanguageinfo.cpp \
+    garrayjson.cpp \
+    gobjectjson.cpp \
+    gxkblayout.cpp \
+    gtimezone.cpp
 
 
 HEADERS += \
@@ -66,7 +71,12 @@ HEADERS += \
     protocol/serverstate.h \
     gcomponentmanager.h \
     utils/deviceinfo.h \
-    utils/partitioninfo.h
+    utils/partitioninfo.h \
+    glanguageinfo.h \
+    garrayjson.h \
+    gobjectjson.h \
+    gxkblayout.h \
+    gtimezone.h
 
 unix {
     target.path = /usr/lib

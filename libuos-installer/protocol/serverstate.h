@@ -4,6 +4,11 @@
 #include "utils/propertyreflection.h"
 #include "utils/singleton.h"
 
+#define SERVER_STATE_IDLE 1
+#define SERVER_STATE_INSTALLING 2
+#define SERVER_STATE_INSTALL_FINISHED 3
+#define SERVER_STATE_INSTALL_ERROR 4
+
 class ServerState : public PropertyReflection, public Singleton<ServerState>
 {
     Q_OBJECT

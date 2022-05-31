@@ -2,6 +2,7 @@
 
 #include <QLocalSocket>
 #include <QCoreApplication>
+#include <QDebug>
 
 LocalSocket::LocalSocket(QObject *parent) : LocalInterface(parent),
     m_socket(nullptr)

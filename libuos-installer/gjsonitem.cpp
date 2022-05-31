@@ -5,6 +5,12 @@ GJsonItem::GJsonItem()
 
 }
 
+GJsonItem::GJsonItem(const QJsonObject &object):
+    attributes(object)
+{
+
+}
+
 GJsonItem::~GJsonItem()
 {
 
@@ -23,4 +29,14 @@ void GJsonItem::appendValue(const QString &key, const QString &value)
 void GJsonItem::removeValue(const QString &key)
 {
     attributes.remove(key);
+}
+
+QString GJsonItem::value(const QString &key)
+{
+    return attributes.value(key).toString();
+}
+
+bool GJsonItem::contains(const QString &key)
+{
+    return attributes.contains(key);
 }

@@ -14,6 +14,11 @@ GJson::GJson(const QByteArray &data):
 
 }
 
+GJson::GJson(const GJson &other):
+    m_doc(other.m_doc)
+{
+}
+
 GJson::~GJson()
 {
 }

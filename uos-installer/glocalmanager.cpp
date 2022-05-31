@@ -13,6 +13,9 @@
 #include "systeminfoconfig.h"
 #include "partedconfig.h"
 #include "userinput.h"
+#include "glanguageinfo.h"
+#include "gxkblayout.h"
+#include "gtimezone.h"
 
 #include <QtConcurrent>
 #include <QCoreApplication>
@@ -59,6 +62,9 @@ void GLocalManager::startInstall()
     if (!m_inter) {
         return;
     }
+    m_flowList.append(GProtocol::generateFrame(cmd_get_language, "language"));
+    m_flowList.append(GProtocol::generateFrame(cmd_get_xkblayout, "xkblayout"));
+    m_flowList.append(GProtocol::generateFrame(cmd_get_timezone, "timezone"));
     m_flowList.append(GProtocol::getDevicesFrame());
     m_flowList.append(GProtocol::generateFrame(cmd_get_component, "component"));
     m_flowList.append(GProtocol::startInstallFrame());
@@ -86,6 +92,12 @@ void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
         GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
         info.commitData();
         notifyResponse(info);
+    } else if (type == cmd_get_log) {
+        qInfo() << "export log file:" << Tools::WriteFile(QString("/tmp/ex-uos-installer-server.log"), frame);
+        m_inter->send(GProtocol::exitServerFrame());
+        QTimer::singleShot(2000, this, []{
+            qApp->exit();
+        });
     } else {
         qWarning() << "invalid data";
     }
@@ -102,15 +114,22 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
     QString cmd = info.object().value("result").toObject().value("command").toString();
     //qInfo() << cmd;
     if (cmd == cmd_notify_install_result) {
-        m_inter->send(GProtocol::exitServerFrame());
-        QTimer::singleShot(2000, this, []{
-            qApp->exit();
-        });
+        m_inter->send(GProtocol::generateFrame(cmd_get_log, "1"));
         qInfo() << tr("Install finished.");
+        qInfo() << tr("pull log");
         return;
+    } else if (cmd == cmd_get_language) {
+        SystemInfoConfig::Instance()->setLanguage(GLanguageInfo(info.object().value("language").toArray()));
+        next();
+    } else if (cmd == cmd_get_xkblayout) {
+        GXkbLayout xkb(info.object().value("xkblayout").toObject());
+        SystemInfoConfig::Instance()->setXkblayout(xkb);
+        next();
+    } else if (cmd == cmd_get_timezone) {
+        SystemInfoConfig::Instance()->setTimerzone(GTimezone(info.object().value("timezone").toArray()));
+        next();
     } else if (cmd == cmd_get_component) {
         GComponentManager::Instance()->commitData(info.object().value("component").toObject());
-        GComponentManager::Instance()->exportfile("./component.json");
         QStringList componentList = GComponentManager::Instance()->componentList();
         if (componentList.count() <= 0) {
             qCritical() << tr("not found valid component");

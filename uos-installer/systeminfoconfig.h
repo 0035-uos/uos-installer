@@ -3,6 +3,9 @@
 
 #include "utils/singleton.h"
 #include "configinterface.h"
+#include "glanguageinfo.h"
+#include "gxkblayout.h"
+#include "gtimezone.h"
 
 class GSysInfo;
 class SystemInfoConfig : public ConfigInterface, public Singleton<SystemInfoConfig>
@@ -16,6 +19,12 @@ public:
     void cleanData();
     GJson* data();
 
+    void setLanguage(const GLanguageInfo &language);
+
+    void setXkblayout(const GXkbLayout &xkblayout);
+
+    void setTimerzone(const GTimezone &timerzone);
+
 private:
     QString getusername();
     QString getpassword();
@@ -24,6 +33,10 @@ private:
 
 private:
     GSysInfo* m_data;
+
+    GLanguageInfo m_language;
+    GXkbLayout m_xkblayout;
+    GTimezone m_timerzone;
 };
 
 #endif // SYSTEMINFOCONFIG_H

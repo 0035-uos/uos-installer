@@ -28,6 +28,7 @@ GManager::GManager(QObject *parent) : QObject(parent)
     readPwConf();
     GComponentManager::Instance()->loadfile(Tools::packages_default);
     ServerState::Instance()->setLoadPackagesDefault(GComponentManager::Instance()->state());
+    ServerState::Instance()->setState(SERVER_STATE_IDLE);
 }
 
 GManager::~GManager()

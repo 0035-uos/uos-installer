@@ -1,5 +1,5 @@
 QT -= gui
-QT += network concurrent
+QT += network concurrent xml
 CONFIG += c++11 console
 CONFIG -= app_bundle
 

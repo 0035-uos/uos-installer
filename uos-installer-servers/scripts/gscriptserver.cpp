@@ -7,6 +7,9 @@
 #include "gnotifyinfo.h"
 #include "devices/gdevices.h"
 #include "gcomponentmanager.h"
+#include "glanguageinfo.h"
+#include "gtimezone.h"
+#include "gxkblayout.h"
 
 #include <QtDebug>
 #include <QFile>
@@ -26,6 +29,10 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_registerFunction[cmd_exit_server] = std::bind(&GScriptServer::onExit, this, std::placeholders::_1);
     m_registerFunction[cmd_set_component] = std::bind(&GScriptServer::onSetComponent, this, std::placeholders::_1);
     m_registerFunction[cmd_get_component] = std::bind(&GScriptServer::onGetComponent, this, std::placeholders::_1);
+    m_registerFunction[cmd_get_log] = std::bind(&GScriptServer::onGetLog, this, std::placeholders::_1);
+    m_registerFunction[cmd_get_language] = std::bind(&GScriptServer::onGetLanguage, this, std::placeholders::_1);
+    m_registerFunction[cmd_get_xkblayout] = std::bind(&GScriptServer::onGetXkbLayout, this, std::placeholders::_1);
+    m_registerFunction[cmd_get_timezone] = std::bind(&GScriptServer::onGetTimezone, this, std::placeholders::_1);
 
     connect(m_script, &GScriptsRunAbstract::finished, this, &GScriptServer::finished);
 }
@@ -43,6 +50,7 @@ void GScriptServer::finished(const QString &cmd, const QByteArray &data)
     Q_UNUSED(data)
     GNotifyInfo info2 = GNotifyInfo::reponse(cmd_notify_install_result, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info2.data()));
+    ServerState::Instance()->setState(SERVER_STATE_INSTALL_FINISHED);
 }
 
 void GScriptServer::onGetDevices(const QByteArray &data)
@@ -98,7 +106,7 @@ void GScriptServer::onSetSysInfo(const QByteArray &data)
 void GScriptServer::onGetComponent(const QByteArray &data)
 {
     Q_UNUSED(data)
-    qInfo() << __func__;
+    qInfo() << __func__ << data;
     GNotifyInfo info = GNotifyInfo::reponse(cmd_get_component, true, "component"); // undo
     info.appendItem("component", GComponentManager::Instance()->object());
     info.commitData();
@@ -138,6 +146,7 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     GNotifyInfo info1 = GNotifyInfo::reponse(cmd_start_install, true, "desc"); // undo
     sigSend(GProtocol::getNotifyFrame(info1.data()));
 
+    ServerState::Instance()->setState(SERVER_STATE_INSTALLING);
     m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh << ServerState::Instance()->getDevicePath());
 }
 
@@ -146,5 +155,86 @@ void GScriptServer::onExit(const QByteArray &data)
 {
     Q_UNUSED(data);
     emit sigExitServer();
+}
+
+void GScriptServer::onGetLog(const QByteArray &data)
+{
+    Q_UNUSED(data)
+    QByteArray frame = Tools::ReadFile(Tools::installer_server_log_file).toLocal8Bit();
+    sigSend(GProtocol::generateFrame(cmd_get_log, frame));
+}
+
+void GScriptServer::onGetXkbLayout(const QByteArray &data)
+{
+    Q_UNUSED(data)
+    qInfo() << __func__;
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_get_xkblayout, true, "xkblayout");
+
+    GXkbLayout xkblayout;
+
+
+    Tools::XkbConfig xkb = Tools::GetXkbConfig();
+
+    GArrayJson layoutarray;
+    for (const Tools::XkbLayout& layout : xkb.layout_list) {
+        GJsonItem item;
+        item.appendValue("name", layout.name);
+        item.appendValue("description", layout.description);
+        GArrayJson array;
+        for (const Tools::XkbLayoutVariant& variant : layout.variant_list) {
+            GJsonItem variantitem;
+            variantitem.appendValue("name", variant.name);
+            variantitem.appendValue("description", variant.description);
+            array.appendItem(&variantitem);
+        }
+        array.commitData();
+        item.appendValue("variantList", array.data());
+        layoutarray.appendItem(&item);
+    }
+    layoutarray.commitData();
+
+    xkblayout.appendArray("layout_list", layoutarray);
+    xkblayout.commitData();
+
+    GJsonItem item;
+    item.appendValue("xkblayout", xkblayout.data());
+
+    info.appendItem("xkblayout",  &item);
+    info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
+void GScriptServer::onGetLanguage(const QByteArray &data)
+{
+    Q_UNUSED(data)
+    qInfo() << __func__;
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_get_language, true, "language");
+    info.appendItem("language", GJson(Tools::languages_path).array());
+    info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
+void GScriptServer::onGetTimezone(const QByteArray &data)
+{
+    Q_UNUSED(data)
+    qInfo() << __func__;
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_get_timezone, true, "timezone");
+
+    GTimezone zone;
+    Tools::ZoneInfoList zonelist = Tools::GetZoneInfoList();
+    for (const Tools::ZoneInfo& info : zonelist) {
+        GJsonItem item;
+        item.appendValue("country", info.country);
+        item.appendValue("timezone", info.timezone);
+        item.appendValue("latitude", QString::number(info.latitude));
+        item.appendValue("longitude", QString::number(info.longitude));
+        item.appendValue("distance", QString::number(info.distance));
+        zone.appendItem(&item);
+    }
+    zone.commitData();
+
+    info.appendItem("timezone", zone.array());
+    info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 
