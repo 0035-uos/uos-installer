@@ -22,6 +22,10 @@ copy_dir(){
     chmod -R 777 $work_path
 }
 
+process_control(){
+    echo "$1" > /tmp/uos-installer-process
+}
+
 main(){  
     
     DEVICE="$1"
@@ -36,11 +40,15 @@ main(){
 
     cd  $work_path || exit
     cd ./auto-part/ || exit
+    process_control "auto_part start_part"
     bash ./auto_part.sh "$DEVICE" "$disk_settings_path"
+    process_control "auto_part mount_target"
     bash ./mount_target.sh "$DEVICE" "$disk_settings_path"
     cd ..
 
+
     bash ./before_chroot/before_chroot.sh
+    process_control "before_chroot creat_fstab"
     bash ./auto-part/create_fstab.sh
     
     bash ./tools/mount_chroot.sh "$chroot_path"
@@ -48,6 +56,7 @@ main(){
     cp -v $user_settings_path "$chroot_path"/$user_settings_path
     cp -v $packagelist_path "$chroot_path"/$packagelist_path
     chmod a+x "$chroot_path"/$work_path/*.sh
+    process_control "in_chroot"
     chroot "$chroot_path" /$work_path/in_chroot.sh "$DEVICE"
 
     bash ./tools/umount_chroot.sh "$chroot_path"

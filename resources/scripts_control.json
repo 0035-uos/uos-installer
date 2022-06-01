@@ -1,0 +1,71 @@
+{
+    "step_list": "auto_part,before_chroot,before_chroot,in_chroot,user_setting",
+    "auto_part": {
+        "name_us": "auto_part",
+        "name_zh": "自动分区",
+        "step_list": "start_part,mount_target",
+        "start_part":{
+            "name_us": "start_part",
+            "name_zh": "开始分区"
+        },
+        "mount_target":{
+            "name_us": "mount_target",
+            "name_zh": "挂载分区"
+        }
+    },
+    "before_chroot": {
+        "name_us": "before_chroot",
+        "name_zh": "初始化安装环境",
+        "step_list" :"start_unsquashfs,set_repo,creat_fstab",
+        "start_unsquashfs":{
+            "name_us": "start_unsquashfs",
+            "name_zh": "解压文件系统"
+        },
+        "set_repo":{
+            "name_us": "set_repo",
+            "name_zh": "设置仓库"
+        },   
+        "creat_fstab":{
+            "name_us": "creat_fstab",
+            "name_zh": "创建fstab文件"
+        }
+    },
+    "in_chroot": {
+        "name_us": "in_chroot",
+        "name_zh": "安装环境内设置",
+        "step_list" :"instatll_package,setup_bootloader",
+        "instatll_package":{
+            "name_us": "instatll_package",
+            "name_zh": "安装软件包"
+        },
+        "setup_bootloader":{
+            "name_us": "setup_bootloader",
+            "name_zh": "设置启动分区"
+        }
+    },
+    "user_setting":{
+        "name_us": "user_setting",
+        "name_zh": "用户设置",
+        "step_list" :"setup_user,setup_locale,setup_timezone,setup_keyboard,setup_lightdm",
+        "setup_user":{
+            "name_us": "setup_user",
+            "name_zh": "设置用户名"
+        },
+        "setup_locale":{
+            "name_us": "setup_locale",
+            "name_zh": "设置语言"
+        },
+        "setup_timezone":{
+            "name_us": "setup_timezone",
+            "name_zh": "设置时区"
+        },
+        "setup_keyboard":{
+            "name_us": "setup_keyboard",
+            "name_zh": "设置键盘"
+        },
+        "setup_lightdm":{
+            "name_us": "setup_lightdm",
+            "name_zh": "设置图形"
+        }
+    }
+}
