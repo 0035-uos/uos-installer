@@ -3,6 +3,10 @@ isomount_path=""
 squashfs_path=""
 work_path="/uos-installer/before_chroot/"
 
+process_control(){
+    echo "$1" > /tmp/uos-installer-process
+}
+
 if grep -q boot=casper /proc/cmdline; then
   BOOT=casper
   CDROM=/cdrom
@@ -35,6 +39,7 @@ if [ -f $CDROM/live/minios.img ];then
   squashfs_path=$CDROM/live/minios.img
 fi
 
-
+process_control "before_chroot start_unsquashfs"
 bash $work_path/un_squashfs.sh $squashfs_path
+process_control "before_chroot set_repo"
 bash $work_path/set_repo.sh $isomount_path
