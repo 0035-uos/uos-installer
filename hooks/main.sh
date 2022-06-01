@@ -6,6 +6,7 @@ work_path="/uos-installer"
 user_settings_path="$work_path/installer_settings.json"
 disk_settings_path="$work_path/parted.json"
 packagelist_path="$work_path/package.list"
+process_control_path="/tmp/uos-installer-process"
 
 user_check(){  
     if [ "$USER" != "root" ];then
@@ -23,7 +24,7 @@ copy_dir(){
 }
 
 process_control(){
-    echo "$1" > /tmp/uos-installer-process
+    echo "$1" > "$process_control_path"
 }
 
 main(){  
@@ -56,8 +57,10 @@ main(){
     cp -v $user_settings_path "$chroot_path"/$user_settings_path
     cp -v $packagelist_path "$chroot_path"/$packagelist_path
     chmod a+x "$chroot_path"/$work_path/*.sh
-    process_control "in_chroot"
+    process_control "in_chroot start"
     chroot "$chroot_path" /$work_path/in_chroot.sh "$DEVICE"
+
+    echo "in_chroot end" > /target"$process_control_path"
 
     bash ./tools/umount_chroot.sh "$chroot_path"
     bash ./auto-part/umount_target.sh
