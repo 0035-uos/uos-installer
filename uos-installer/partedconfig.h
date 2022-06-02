@@ -23,9 +23,8 @@ public:
     QString defaultDevicePath() const;
     void setDefaultDevicePath(const QString &defaultDevicePath);
 
-signals:
-
-public slots:
+private:
+    qint64 correctionSector(qint64 sector, bool rounding = true);
 
 private:
     GPartedInfo* m_data;

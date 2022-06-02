@@ -43,21 +43,21 @@ void PartedConfig::run()
         qApp->exit(0);
         return;
     }
+
     // 默认分区方案
 
     //qint64 dev_size = dev->getSectorSize() * dev->getLength()/GByte;
 
     // check dev_size
 
-    qint64 efi_size = 385 * MByte;
+    qint64 efi_size = 384 * MByte;
     qint64 free_sector = dev->getLength();
     qint64 efi_sector = efi_size / dev->getSectorSize();
     // 需要添加efi分区 不小于300MB  推荐385MB
     if (ServerState::Instance()->getEfi()) {
         GPartedItem item{"fat32", "EFI", "/boot/efi", QString::number(efi_sector)};
         m_data->appendItem(&item);
-    } else {
-        efi_sector = 0;
+        free_sector = free_sector - efi_sector;
     }
 
     qint64 swapSpace =  ServerState::Instance()->getMemTotal() * 2;
@@ -68,15 +68,17 @@ void PartedConfig::run()
     if (swapSector > free_sector*.2) {
         swapSector = qint64(free_sector*.2);
     }
+    swapSpace = correctionSector(swapSpace);
     {
         GPartedItem item{"linux-swap", "SWAP", "swap", QString::number(swapSector)};
         m_data->appendItem(&item);
     }
-    free_sector = free_sector - efi_sector - swapSector;
+    free_sector = free_sector - swapSector;
 
     // 兼容pmon固件
     if (!(Tools::is_x86())) {
         qint64 boot_sector = qint64(1.5 * GByte / dev->getSectorSize());
+        boot_sector = correctionSector(boot_sector);
         GPartedItem item{"ext3", "Boot", "/boot", QString::number(boot_sector)};
         m_data->appendItem(&item);
         free_sector -= boot_sector;
@@ -85,16 +87,19 @@ void PartedConfig::run()
     qint64 parted_limit = 64 * GByte / dev->getSectorSize(); // undo
     if (free_sector >= parted_limit) { // /(%40) + /data(60%)
         qint64 roota_sector = qint64(free_sector * .4);
+        roota_sector = correctionSector(roota_sector);
         {
             GPartedItem item{"ext4", "Roota", "/", QString::number(roota_sector)};
             m_data->appendItem(&item);
         }
         free_sector -= roota_sector;
         {
+            free_sector = correctionSector(free_sector, false);
             GPartedItem item{"ext4", "_dde_data", "/data", QString::number(free_sector)};
             m_data->appendItem(&item);
         }
     } else { // /(100%)
+        free_sector = correctionSector(free_sector, false);
         GPartedItem item{"ext4", "Roota", "/", QString::number(free_sector)};
         m_data->appendItem(&item);
     }
@@ -133,4 +138,9 @@ QString PartedConfig::defaultDevicePath() const
 void PartedConfig::setDefaultDevicePath(const QString &defaultDevicePath)
 {
     m_defaultDevicePath = defaultDevicePath;
+}
+
+qint64 PartedConfig::correctionSector(qint64 sector, bool rounding)
+{
+    return qint64(1.0*sector / 2048.0 + (rounding ? 0.5 : 0)) * 2048;
 }
