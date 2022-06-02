@@ -56,6 +56,8 @@ void PartedConfig::run()
     if (ServerState::Instance()->getEfi()) {
         GPartedItem item{"fat32", "EFI", "/boot/efi", QString::number(efi_sector)};
         m_data->appendItem(&item);
+    } else {
+        efi_sector = 0;
     }
 
     qint64 swapSpace =  ServerState::Instance()->getMemTotal() * 2;

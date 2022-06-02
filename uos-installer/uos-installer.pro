@@ -30,7 +30,6 @@ SOURCES += \
     systeminfoconfig.cpp \
     configinterface.cpp \
     partedconfig.cpp \
-    settingsmanager.cpp \
     userinput.cpp
 
 HEADERS += \
@@ -40,7 +39,6 @@ HEADERS += \
     systeminfoconfig.h \
     configinterface.h \
     partedconfig.h \
-    settingsmanager.h \
     userinput.h
 
 # Default rules for deployment.

@@ -10,6 +10,7 @@
 #include "glanguageinfo.h"
 #include "gtimezone.h"
 #include "gxkblayout.h"
+#include "settingsmanager.h"
 
 #include <QtDebug>
 #include <QFile>
@@ -18,9 +19,12 @@
 #include <QJsonDocument>
 #include <QFileInfo>
 
+
+
 GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_script(new GScriptsRunAbstract)
 {
+#define REGISTERFUNCTION(cmd, func) m_registerFunction[cmd] = std::bind(&GScriptServer::func, this, std::placeholders::_1);
     m_registerFunction[cmd_get_devices] = std::bind(&GScriptServer::onGetDevices, this, std::placeholders::_1);
      m_registerFunction[cmd_set_install_devices] = std::bind(&GScriptServer::onSetDevice, this, std::placeholders::_1);
     m_registerFunction[cmd_set_parted] = std::bind(&GScriptServer::onSetParted, this, std::placeholders::_1);
@@ -33,6 +37,7 @@ GScriptServer::GScriptServer(QObject *parent) : QObject(parent),
     m_registerFunction[cmd_get_language] = std::bind(&GScriptServer::onGetLanguage, this, std::placeholders::_1);
     m_registerFunction[cmd_get_xkblayout] = std::bind(&GScriptServer::onGetXkbLayout, this, std::placeholders::_1);
     m_registerFunction[cmd_get_timezone] = std::bind(&GScriptServer::onGetTimezone, this, std::placeholders::_1);
+    REGISTERFUNCTION(cmd_set_user_settings, onSetUserSettings)
 
     connect(m_script, &GScriptsRunAbstract::finished, this, &GScriptServer::finished);
 }
@@ -236,5 +241,12 @@ void GScriptServer::onGetTimezone(const QByteArray &data)
     info.appendItem("timezone", zone.array());
     info.commitData();
     sigSend(GProtocol::getNotifyFrame(info.data()));
+}
+
+void GScriptServer::onSetUserSettings(const QByteArray &data)
+{
+    qInfo() << __func__;
+    SettingsManager::Instance()->loaddata(data);
+    SettingsManager::Instance()->exportfile("./user.json");
 }
 

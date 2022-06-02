@@ -26,6 +26,8 @@ static const QString installer_log_file = QString("/var/log/%1").arg("uos-instal
 
 static const QString password_conf_file = "/etc/deepin/dde.conf";
 
+static const QString user_settings = "/usr/share/uos-installer/uos-installer-settings.json";
+
 static const qint64 TByte = 1024*1024*1024*1024L;
 static const qint64 GByte = 1024*1024*1024L;
 static const qint64 MByte = 1024*1024L;

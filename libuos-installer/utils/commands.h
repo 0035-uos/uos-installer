@@ -31,6 +31,8 @@ static const QByteArray cmd_get_xkblayout("CMD_GET_XKBLAYOUT");
 static const QByteArray cmd_get_language("CMD_GET_LANGUAGE");
 static const QByteArray cmd_get_timezone("CMD_GET_TIMEZONE");
 
+static const QByteArray cmd_set_user_settings("CMD_SET_USER_SETTINGS");
+
 
 static const QByteArray cmd_notify_response("CMD_NOTIFY_RESPONSE");
 static const QByteArray cmd_notify_install_result("CMD_NOTIFY_INSTALL_RESULT");

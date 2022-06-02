@@ -16,6 +16,7 @@
 #include "glanguageinfo.h"
 #include "gxkblayout.h"
 #include "gtimezone.h"
+#include "settingsmanager.h"
 
 #include <QtConcurrent>
 #include <QCoreApplication>
@@ -62,6 +63,8 @@ void GLocalManager::startInstall()
     if (!m_inter) {
         return;
     }
+    SettingsManager::Instance()->loadfile(Tools::user_settings);
+    m_flowList.append(GProtocol::generateFrame(cmd_set_user_settings, SettingsManager::Instance()->data()));
     m_flowList.append(GProtocol::generateFrame(cmd_get_language, "language"));
     m_flowList.append(GProtocol::generateFrame(cmd_get_xkblayout, "xkblayout"));
     m_flowList.append(GProtocol::generateFrame(cmd_get_timezone, "timezone"));
@@ -175,6 +178,8 @@ void GLocalManager::notifyResponse(const GNotifyInfo &info)
         next();
     } else if (cmd == cmd_start_install) {
         qInfo() << tr("Installing, please waiting....");
+    } else {
+        next();
     }
 }
 

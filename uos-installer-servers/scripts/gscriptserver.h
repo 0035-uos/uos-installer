@@ -37,6 +37,7 @@ private:
     void onGetXkbLayout(const QByteArray& data);
     void onGetLanguage(const QByteArray& data);
     void onGetTimezone(const QByteArray& data);
+    void onSetUserSettings(const QByteArray& data);
 private:
     GScriptsRunAbstract* m_script;
     QMap<QByteArray, std::function<void(const QByteArray&)>> m_registerFunction;

@@ -48,7 +48,8 @@ SOURCES += \
     garrayjson.cpp \
     gobjectjson.cpp \
     gxkblayout.cpp \
-    gtimezone.cpp
+    gtimezone.cpp \
+    settingsmanager.cpp
 
 
 HEADERS += \
@@ -76,7 +77,8 @@ HEADERS += \
     garrayjson.h \
     gobjectjson.h \
     gxkblayout.h \
-    gtimezone.h
+    gtimezone.h \
+    settingsmanager.h
 
 unix {
     target.path = /usr/lib
