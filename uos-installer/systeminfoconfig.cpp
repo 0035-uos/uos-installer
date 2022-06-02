@@ -4,12 +4,13 @@
 #include "parameter.h"
 #include "protocol/serverstate.h"
 #include "userinput.h"
-#ifdef DEEEPIN_PW_CHECK
-#include "deepin_pw_check.h"
-#endif
-#include <QDebug>
-
+#include <deepin_pw_check.h>
 #include <iostream>
+#include <QDebug>
+#include <QRegExp>
+#include <QSettings>
+
+#define PASSWORD_LEVEL 0
 
 SystemInfoConfig::SystemInfoConfig(QObject *parent) : ConfigInterface(parent)
 {
@@ -109,8 +110,25 @@ QString SystemInfoConfig::getpassword()
 
 bool SystemInfoConfig::usernameCheck(const QString &username)
 {
+    int usernameMinLen = 3;
+    int usernameMaxLen = 32;
     static QStringList ignore = ServerState::Instance()->getIgnoreUsername().split(":", QString::SkipEmptyParts);
-    if (ignore.contains(username)) {
+    if ((username.isEmpty() && (usernameMinLen > 0))) {
+        std::cout << tr("Username can only contain lowercase letters, numbers and symbols (_-)").toStdString() << std::endl;
+        return false;
+    } else if ((username.length() > usernameMaxLen) || (username.length() < usernameMinLen)) {
+        std::cout << tr("Please input a username longer than %1 characters and "
+                        "shorter than %2 characters")
+                     .arg(usernameMinLen)
+                     .arg(usernameMaxLen).toStdString() << std::endl;
+        return false;
+    }  else if (username.at(0).unicode() < 'a' || username.at(0).unicode() > 'z') {
+        std::cout << tr("The first letter must be in lowercase").toStdString() << std::endl;
+        return false;
+    } else if (!(QRegExp("[a-z][a-z0-9_-]*").exactMatch(username))) {
+        std::cout << tr("Username can only contain lowercase letters, numbers and symbols (_-)").toStdString() << std::endl;
+        return false;
+    } else if (ignore.contains(username)) {
         std::cout << tr("The user name already exitsts").toStdString() << std::endl;
         return false;
     }
@@ -119,16 +137,40 @@ bool SystemInfoConfig::usernameCheck(const QString &username)
 
 bool SystemInfoConfig::passwordCheck(const QString &password)
 {
-    Q_UNUSED(password)
-#ifdef DEEEPIN_PW_CHECK
-    // 这里可以调用dde-pw-check检查，使用dde-pw-check要记得添加依赖
-    if (password.length() < 2) {
-        std::cout << tr("Please enter a longer passwrod").toStdString() << std::endl;
-        return false;
+    PW_ERROR_TYPE type = deepin_pw_check(getusername().toStdString().c_str(), password.toStdString().c_str(), PASSWORD_LEVEL, nullptr);
+    qDebug() << "password checked: " << err_to_string(type);
+
+    int passwdMinLen = get_pw_min_length(PASSWORD_LEVEL);
+    int passwdMaxLen = get_pw_max_length(PASSWORD_LEVEL);
+    bool ret = false;
+
+    static QMap<PW_ERROR_TYPE, QString> err_string {
+        {PW_ERR_PASSWORD_EMPTY, tr("The password cannot be empty​")},
+        {PW_ERR_LENGTH_SHORT, tr("Password must be between %1 and %2 characters")
+                    .arg(passwdMinLen).arg(passwdMaxLen)},
+        {PW_ERR_CHARACTER_INVALID, tr("The password should contain at least %1 of the four available character types: "
+                                      "lowercase letters, uppercase letters, numbers, and symbols (~`!@#$%^&*()-_+=|\\{}[]:\"'<>,.?/)")
+                    .arg(get_pw_min_character_type(PASSWORD_LEVEL))},
+        {PW_ERR_PALINDROME, tr("Password must not contain more than %1 palindrome characters")
+                    .arg(get_pw_palimdrome_num(PASSWORD_LEVEL))},
+        {PW_ERR_WORD, tr("Do not use common words and combinations as password")},
+        {PW_ERR_PW_MONOTONE, tr("Create a strong password please")},
+        {PW_ERR_PW_REPEAT, tr("It does not meet password rules")}
+    };
+
+    err_string [PW_ERR_LENGTH_LONG] = err_string[PW_ERR_LENGTH_SHORT];
+    err_string [PW_ERR_PW_CONSECUTIVE_SAME] = err_string [PW_ERR_PW_MONOTONE];
+    err_string [PW_ERR_PW_FIRST_UPPERM] = err_string [PW_ERR_PARA] = err_string [PW_ERR_INTERNAL] =
+            err_string [PW_ERR_USER] = err_string [PW_ERR_MAX] = err_string [PW_ERR_PW_REPEAT];
+
+    if (type == PW_NO_ERR) {
+        ret = true;
+    } else if (err_string.contains(type)) {
+        std::cout << err_string.value(type).toStdString() << std::endl;
+    } else {
+        std::cout << tr("Unknown error").toStdString() << std::endl;
     }
-#else
-#endif
-    return  true;
+    return ret;
 }
 
 void SystemInfoConfig::setTimerzone(const GTimezone &timerzone)
