@@ -152,7 +152,12 @@ void GScriptServer::onStartInstall(const QByteArray &data)
     sigSend(GProtocol::getNotifyFrame(info1.data()));
 
     ServerState::Instance()->setState(SERVER_STATE_INSTALLING);
-    m_script->startRun("/bin/bash", QStringList()<< Tools::main_sh << ServerState::Instance()->getDevicePath());
+    QStringList args;
+    args << QStringList()<< Tools::main_sh << ServerState::Instance()->getDevicePath();
+    if (SettingsManager::Instance()->value("autoDetectEfi") != "true") {
+        args << SettingsManager::Instance()->value("fixEfi");
+    }
+    m_script->startRun("/bin/bash", args);
 }
 
 

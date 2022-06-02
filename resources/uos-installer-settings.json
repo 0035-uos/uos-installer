@@ -1,3 +1,4 @@
 {
-    "autoDetectEfi":"true"
+    "autoDetectEfi":"true",
+    "fixEfi":"false"
 }
