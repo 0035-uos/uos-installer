@@ -242,7 +242,7 @@ creat_part(){
   #获取磁盘最大容量，如果part_end 大于最大容量，将最大容量设为end
   device_end=$(parted -s "$device" unit s print| grep "Disk $device" |awk '{print $3}'|sed "s|s||g")
   if [ $part_end -gt $device_end ];then
-    part_end=$device_end
+    part_end="100%"
   fi
 
   if [ x"$EFI" == "xtrue" ];then
