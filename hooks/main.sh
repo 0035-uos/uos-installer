@@ -35,6 +35,11 @@ main(){
         exit 2
     fi
 
+    EFI=""
+    if [[ -n $2 ]];then
+        EFI="$2"
+    fi
+
     user_check
     copy_dir
     
@@ -42,7 +47,7 @@ main(){
     cd  $work_path || exit
     cd ./auto-part/ || exit
     process_control "auto_part start_part"
-    bash ./auto_part.sh "$DEVICE" "$disk_settings_path"
+    bash ./auto_part.sh "$DEVICE" "$disk_settings_path" "$EFI"
     process_control "auto_part mount_target"
     bash ./mount_target.sh "$DEVICE" "$disk_settings_path"
     cd ..
@@ -52,13 +57,13 @@ main(){
     process_control "before_chroot creat_fstab"
     bash ./auto-part/create_fstab.sh
     
-    bash ./tools/mount_chroot.sh "$chroot_path"
+    bash ./tools/mount_chroot.sh "$chroot_path" "$EFI"
     cp -rv ./in_chroot "$chroot_path"/$work_path
     cp -v $user_settings_path "$chroot_path"/$user_settings_path
     cp -v $packagelist_path "$chroot_path"/$packagelist_path
     chmod a+x "$chroot_path"/$work_path/*.sh
     process_control "in_chroot start"
-    chroot "$chroot_path" /$work_path/in_chroot.sh "$DEVICE"
+    chroot "$chroot_path" /$work_path/in_chroot.sh "$DEVICE" "$EFI"
 
     echo "in_chroot end" > /target"$process_control_path"
 
