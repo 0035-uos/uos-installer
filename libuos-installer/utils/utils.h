@@ -20,8 +20,8 @@ static const QString ignore_username = "/usr/share/uos-installer/username.ignore
 static const QString installer_server_log_file = QString("/tmp/%1").arg("uos-installer-server.log");
 static const QString installer_log_file = QString("/tmp/%1").arg("uos-installer.log");
 #else
-static const QString installer_server_log_file = QString("/var/log/%1").arg(uos-installer-server.log);
-static const QString installer_log_file = QString("/var/log/%1").arg(uos-installer.log);
+static const QString installer_server_log_file = QString("/var/log/%1").arg("uos-installer-server.log");
+static const QString installer_log_file = QString("/var/log/%1").arg("uos-installer.log");
 #endif
 
 static const QString password_conf_file = "/etc/deepin/dde.conf";
