@@ -232,12 +232,9 @@ creat_part(){
   part_start=$(get_next_part_start_pos $device)
   part_size=$usage
   if [ "$part_start" == "2048" ];then
-    part_end=$((0 + part_size))
-    part_end=$(((part_end + 256) / 512 * 512)) 
+    part_end=$((part_start + part_size - 1))
   else
-    part_end=$((part_start + part_size))
-    part_end=$(((part_end + 256) / 512 * 512)) 
-    part_start=$(((part_start + 512) / 512 * 512))
+    part_end=$((part_start + part_size - 1))
   fi
   #获取磁盘最大容量，如果part_end 大于最大容量，将最大容量设为end
   device_end=$(parted -s "$device" unit s print| grep "Disk $device" |awk '{print $3}'|sed "s|s||g")
