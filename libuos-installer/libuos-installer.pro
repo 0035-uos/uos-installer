@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += network xml
+QT       += network xml concurrent
 
 QT       -= gui
 
@@ -49,7 +49,8 @@ SOURCES += \
     gobjectjson.cpp \
     gxkblayout.cpp \
     gtimezone.cpp \
-    settingsmanager.cpp
+    settingsmanager.cpp \
+    worker/installworker.cpp
 
 
 HEADERS += \
@@ -78,7 +79,8 @@ HEADERS += \
     gobjectjson.h \
     gxkblayout.h \
     gtimezone.h \
-    settingsmanager.h
+    settingsmanager.h \
+    worker/installworker.h
 
 unix {
     target.path = /usr/lib

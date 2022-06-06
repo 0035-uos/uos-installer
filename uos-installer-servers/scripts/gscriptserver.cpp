@@ -253,5 +253,8 @@ void GScriptServer::onSetUserSettings(const QByteArray &data)
     qInfo() << __func__;
     SettingsManager::Instance()->loaddata(data);
     SettingsManager::Instance()->exportfile("./user.json");
+    GNotifyInfo info = GNotifyInfo::reponse(cmd_set_user_settings, true, "user_settings");
+    info.commitData();
+    sigSend(GProtocol::getNotifyFrame(info.data()));
 }
 

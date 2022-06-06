@@ -3,11 +3,12 @@
 
 #include "utils/singleton.h"
 #include "gnotifyinfo.h"
+#include "worker/installworker.h"
 
 #include <QObject>
 
 class CommunicationInterface;
-class GLocalManager : public QObject, public Singleton<GLocalManager>
+class GLocalManager : public InstallWorker, public Singleton<GLocalManager>
 {
     Q_OBJECT
 public:
@@ -15,22 +16,20 @@ public:
 
     CommunicationInterface* communication();
 
-    void startInstall();
-
+    void installResult(const QByteArray& data);
 public slots:
-    void recvData(const QByteArray& type, const QByteArray& frame);
-    void heartPackets();
+    void recvOtherData(const QByteArray& type, const QByteArray& frame);
     void notifyResponse(const GNotifyInfo& info);
-    void next();
 
-signals:
-    void sigStart();
-private:
-    CommunicationInterface* m_inter;
-
-    QList<QByteArray> m_flowList;
-
-    bool m_serverReady;
+protected:
+    virtual void setLanguage(const GLanguageInfo &language);
+    virtual void setXkblayout(const GXkbLayout &xkblayout);
+    virtual void setTimerzone(const GTimezone &timezone);
+public:
+    virtual void setComponent();
+    virtual void setDevices(const QList<const DeviceInfo*>& devicelist);
+    virtual void setParted();
+    virtual void setSystemInfo();
 };
 
 #endif // GLOCALMANAGER_H

@@ -8,5 +8,6 @@ SUBDIRS += \
     auto-parted \
     uos-installer \
     uos-installer-widget \
-    DevelopTools
+    DevelopTools \
+    uos-installer-qml
 

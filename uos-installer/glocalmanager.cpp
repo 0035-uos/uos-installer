@@ -26,11 +26,10 @@
 
 #include <iostream>
 
-GLocalManager::GLocalManager(QObject *parent) : QObject(parent),
-    m_inter(nullptr), m_serverReady(false)
+GLocalManager::GLocalManager(QObject *parent) : InstallWorker(parent)
 {
-    connect(GProtoManager::Instance(), &GProtoManager::newFrame, this, &GLocalManager::recvData);
-    connect(this, &GLocalManager::sigStart, this, &GLocalManager::next);
+    m_commandList << cmd_set_install_devices;
+    m_commandList << cmd_set_component;
 }
 
 CommunicationInterface *GLocalManager::communication()
@@ -58,135 +57,93 @@ CommunicationInterface *GLocalManager::communication()
     return m_inter;
 }
 
-void GLocalManager::startInstall()
+void GLocalManager::installResult(const QByteArray &data)
 {
-    if (!m_inter) {
-        return;
-    }
-    SettingsManager::Instance()->loadfile(Tools::user_settings);
-    m_flowList.append(GProtocol::generateFrame(cmd_set_user_settings, SettingsManager::Instance()->data()));
-    m_flowList.append(GProtocol::generateFrame(cmd_get_language, "language"));
-    m_flowList.append(GProtocol::generateFrame(cmd_get_xkblayout, "xkblayout"));
-    m_flowList.append(GProtocol::generateFrame(cmd_get_timezone, "timezone"));
-    m_flowList.append(GProtocol::getDevicesFrame());
-    m_flowList.append(GProtocol::generateFrame(cmd_get_component, "component"));
-    m_flowList.append(GProtocol::startInstallFrame());
-
-    QtConcurrent::run(QThreadPool::globalInstance(), [this](){
-        qInfo() << tr("waiting for the server to be ready...");
-        while (!m_serverReady) {
-            QThread::msleep(2000);
-        }
-        qInfo() << tr("server to be ready");
-        emit this->sigStart();
-    });
-    qInfo() << "startinstall";
+    Q_UNUSED(data)
+    m_inter->send(GProtocol::generateFrame(cmd_get_log, "1"));
+    qInfo() << tr("Install finished.");
+    qInfo() << tr("pull log");
 }
 
-void GLocalManager::recvData(const QByteArray &type, const QByteArray &frame)
+void GLocalManager::recvOtherData(const QByteArray &type, const QByteArray &frame)
 {
-    Q_UNUSED(type)
-    if (type == heartbeat_packets) {
-        QJsonObject object = QJsonDocument::fromJson(frame).object();
-        ServerState::Instance()->jsonToPropery(object);
-        heartPackets();
-        return;
-    } else if (type == cmd_notify_response) {
-        GNotifyInfo info(GNotifyInfo::fromeByteArray(frame));
-        info.commitData();
-        notifyResponse(info);
-    } else if (type == cmd_get_log) {
+    if (type == cmd_get_log) {
         qInfo() << "export log file:" << Tools::WriteFile(QString("/tmp/ex-uos-installer-server.log"), frame);
         m_inter->send(GProtocol::exitServerFrame());
         QTimer::singleShot(2000, this, []{
             qApp->exit();
         });
-    } else {
-        qWarning() << "invalid data";
     }
 }
 
-void GLocalManager::heartPackets()
-{
-    m_serverReady = true;
-    //ServerState::Instance();
-}
 
 void GLocalManager::notifyResponse(const GNotifyInfo &info)
 {
+    InstallWorker::notifyResponse(info);
     QString cmd = info.object().value("result").toObject().value("command").toString();
-    //qInfo() << cmd;
-    if (cmd == cmd_notify_install_result) {
-        m_inter->send(GProtocol::generateFrame(cmd_get_log, "1"));
-        qInfo() << tr("Install finished.");
-        qInfo() << tr("pull log");
-        return;
-    } else if (cmd == cmd_get_language) {
-        SystemInfoConfig::Instance()->setLanguage(GLanguageInfo(info.object().value("language").toArray()));
-        next();
-    } else if (cmd == cmd_get_xkblayout) {
-        GXkbLayout xkb(info.object().value("xkblayout").toObject());
-        SystemInfoConfig::Instance()->setXkblayout(xkb);
-        next();
-    } else if (cmd == cmd_get_timezone) {
-        SystemInfoConfig::Instance()->setTimerzone(GTimezone(info.object().value("timezone").toArray()));
-        next();
-    } else if (cmd == cmd_get_component) {
-        GComponentManager::Instance()->commitData(info.object().value("component").toObject());
-        QStringList componentList = GComponentManager::Instance()->componentList();
-        if (componentList.count() <= 0) {
-            qCritical() << tr("not found valid component");
-            qApp->exit(1);
-        }
-        int outIndex;
-        QString outResult;
-        UserInput::UserSelect(outIndex, outResult, componentList, tr("please select install component:"));
-        m_inter->send(GProtocol::generateFrame(cmd_set_component,  outResult.toLocal8Bit()));
-    } else if (cmd == cmd_get_devices) {
-        PartedConfig::Instance()->initData();
-        QJsonArray array = info.object().value("devices").toArray();
-        QStringList devlist, devdesc;
-        if (array.count() <= 0) {
-            qCritical() << tr("not found valid devices");
-            qApp->exit(1);
-        }
-
-        for (int i = 0;i < array.count();i++) {
-            DeviceInfo *info = new DeviceInfo;
-            info->jsonToPropery(array.at(i).toObject());
-            PartedConfig::Instance()->appendDevice(info);
-            devlist << info->getPath();
-            devdesc <<  QString("(%1G)").arg(1.0*info->getLength()*info->getSectorSize()/Tools::GByte);
-        }
-        int outIndex;
-        QString outResult;
-        UserInput::UserSelect(outIndex, outResult, devlist, tr("please select install device:"), true, devdesc);
-        m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, outResult.toLocal8Bit()));
-        PartedConfig::Instance()->setDefaultDevicePath(outResult);
-    } else if (cmd == cmd_set_install_devices) {
-        next();
-    } else if (cmd == cmd_set_component) {
-        PartedConfig::Instance()->run();
-        PartedConfig::Instance()->cleanData();
-        m_inter->send(GProtocol::getPartedFrame(PartedConfig::Instance()->data()));
-    } else if (cmd == cmd_set_parted) {
-        SystemInfoConfig::Instance()->initData();
-        SystemInfoConfig::Instance()->run();
-        SystemInfoConfig::Instance()->cleanData();
-        m_inter->send(GProtocol::getSysInfoFrame(SystemInfoConfig::Instance()->data()));
-    } else if (cmd == cmd_set_sys_info) {
-        next();
-    } else if (cmd == cmd_start_install) {
-        qInfo() << tr("Installing, please waiting....");
-    } else {
-        next();
+    if (!(m_commandList.contains(cmd.toLocal8Bit()))) {
+        qInfo() << "Not processed" << cmd;
     }
 }
 
-void GLocalManager::next()
+
+void GLocalManager::setLanguage(const GLanguageInfo &language)
 {
-    if (!m_inter || m_flowList.length() <= 0) return;
-    QByteArray top = m_flowList.front();
-    m_flowList.removeFirst();
-    m_inter->send(top);
+    SystemInfoConfig::Instance()->setLanguage(language);
+}
+
+void GLocalManager::setXkblayout(const GXkbLayout &xkblayout)
+{
+    SystemInfoConfig::Instance()->setXkblayout(xkblayout);
+}
+
+void GLocalManager::setTimerzone(const GTimezone &timezone)
+{
+    SystemInfoConfig::Instance()->setTimerzone(timezone);
+}
+
+void GLocalManager::setComponent()
+{
+    QStringList componentList = GComponentManager::Instance()->componentList();
+    if (componentList.count() <= 0) {
+        qCritical() << tr("not found valid component");
+        qApp->exit(1);
+    }
+    int outIndex;
+    QString outResult;
+    UserInput::UserSelect(outIndex, outResult, componentList, tr("please select install component:"));
+    m_inter->send(GProtocol::generateFrame(cmd_set_component,  outResult.toLocal8Bit()));
+}
+
+void GLocalManager::setDevices(const QList<const DeviceInfo *> &devicelist)
+{
+    PartedConfig::Instance()->initData();
+    QStringList devlist, devdesc;
+
+    for (const DeviceInfo* info : devicelist) {
+        PartedConfig::Instance()->appendDevice(info);
+        devlist << info->getPath();
+        devdesc <<  QString("(%1G)").arg(1.0*info->getLength()*info->getSectorSize()/Tools::GByte);
+    }
+
+    int outIndex;
+    QString outResult;
+    UserInput::UserSelect(outIndex, outResult, devlist, tr("please select install device:"), true, devdesc);
+    m_inter->send(GProtocol::generateFrame(cmd_set_install_devices, outResult.toLocal8Bit()));
+    PartedConfig::Instance()->setDefaultDevicePath(outResult);
+}
+
+void GLocalManager::setParted()
+{
+    PartedConfig::Instance()->run();
+    PartedConfig::Instance()->cleanData();
+    m_inter->send(GProtocol::getPartedFrame(PartedConfig::Instance()->data()));
+}
+
+void GLocalManager::setSystemInfo()
+{
+    SystemInfoConfig::Instance()->initData();
+    SystemInfoConfig::Instance()->run();
+    SystemInfoConfig::Instance()->cleanData();
+    m_inter->send(GProtocol::getSysInfoFrame(SystemInfoConfig::Instance()->data()));
 }
