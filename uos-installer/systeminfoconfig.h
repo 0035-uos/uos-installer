@@ -37,6 +37,7 @@ private:
     GLanguageInfo m_language;
     GXkbLayout m_xkblayout;
     GTimezone m_timerzone;
+    QString m_username;
 };
 
 #endif // SYSTEMINFOCONFIG_H

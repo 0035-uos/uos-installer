@@ -49,14 +49,14 @@ void SystemInfoConfig::run()
     }
     // 这里可以增加用户自定义设置
     {
-        QString username  = getusername();
+        m_username  = getusername();
         QString password  = getpassword();
 
         GJsonItem user_item;
-        user_item.appendValue("username", username);
+        user_item.appendValue("username", m_username);
         user_item.appendValue("password", password);
         user_item.appendValue("rootpassword", password);
-        user_item.appendValue("hostname", username + "-pc");
+        user_item.appendValue("hostname", m_username + "-pc");
         m_data->appendItem("user", &user_item);
     }
     {
@@ -137,8 +137,8 @@ bool SystemInfoConfig::usernameCheck(const QString &username)
 
 bool SystemInfoConfig::passwordCheck(const QString &password)
 {
-    PW_ERROR_TYPE type = deepin_pw_check(getusername().toStdString().c_str(), password.toStdString().c_str(), PASSWORD_LEVEL, nullptr);
-    qDebug() << "password checked: " << err_to_string(type);
+    PW_ERROR_TYPE type = deepin_pw_check(m_username.toStdString().c_str(), password.toStdString().c_str(), PASSWORD_LEVEL, nullptr);
+//    qDebug() << "password checked: " << err_to_string(type);
 
     int passwdMinLen = get_pw_min_length(PASSWORD_LEVEL);
     int passwdMaxLen = get_pw_max_length(PASSWORD_LEVEL);
