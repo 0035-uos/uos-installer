@@ -23,6 +23,7 @@ void SystemInfoConfig::initData()
 
 void SystemInfoConfig::run()
 {
+#if 0
     { // test
         int c1 = m_language.count();
         for (int i = 0;i < c1; i++) {
@@ -47,6 +48,7 @@ void SystemInfoConfig::run()
         }
         qInfo() << "====================";
     }
+#endif
     // 这里可以增加用户自定义设置
     {
         m_username  = getusername();

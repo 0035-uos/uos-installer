@@ -57,7 +57,7 @@ main(){
     process_control "before_chroot creat_fstab"
     bash ./auto-part/create_fstab.sh
     
-    bash ./tools/mount_chroot.sh "$chroot_path" "$EFI"
+    bash ./tools/mount_chroot.sh "$chroot_path"
     cp -rv ./in_chroot "$chroot_path"/$work_path
     cp -v $user_settings_path "$chroot_path"/$user_settings_path
     cp -v $packagelist_path "$chroot_path"/$packagelist_path
