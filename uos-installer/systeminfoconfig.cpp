@@ -26,7 +26,7 @@ void SystemInfoConfig::run()
     { // test
         int c1 = m_language.count();
         for (int i = 0;i < c1; i++) {
-            qInfo() << i+1 << m_language.value(i).value("name") << m_language.value(i).value("locale") ;
+            //qInfo() << i+1 << m_language.value(i).value("name") << m_language.value(i).value("locale") ;
         }
         qInfo() << "====================";
         int c2 = m_timerzone.count();
@@ -39,10 +39,10 @@ void SystemInfoConfig::run()
         m_xkblayout.commitData();
         int c3 = array.count();
         for (int i = 0;i < c3; i++) {
-            qInfo() << i+1 << array.value(i).value("name") << array.value(i).value("description");
+            //qInfo() << i+1 << array.value(i).value("name") << array.value(i).value("description");
             GArrayJson variantList(array.value(i).value("variantList").toLocal8Bit());
             for (int j = 0; j < variantList.count(); j++) {
-                qInfo() << "\t" << variantList.value(j).value("name") << variantList.value(j).value("description");
+                //qInfo() << "\t" << variantList.value(j).value("name") << variantList.value(j).value("description");
             }
         }
         qInfo() << "====================";

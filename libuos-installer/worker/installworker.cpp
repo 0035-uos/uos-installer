@@ -62,6 +62,8 @@ void InstallWorker::startInstall()
     m_commandList << cmd_get_devices;
     m_commandList << cmd_start_install;
     m_commandList << cmd_notify_install_result;
+    m_commandList << cmd_set_parted;
+    m_commandList << cmd_set_sys_info;
 
     QtConcurrent::run(QThreadPool::globalInstance(), [this](){
         qInfo() << tr("waiting for the server to be ready...");

@@ -39,7 +39,7 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     process->setEnvironment(QProcess::systemEnvironment());
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
           [process](int, QProcess::ExitStatus){
-        QByteArray an = process->readAllStandardOutput();
+        QByteArray an = process->readAllStandardOutput().trimmed();
         if (!an.isEmpty())
             qInfo() << PRINT_INFO(an);
         process->deleteLater();
@@ -48,10 +48,10 @@ int GScriptsRunAbstract::asyncThread(int timeout)
         qInfo() << "start install";
     });
     connect(process, &QProcess::readyReadStandardOutput, this, [process]{
-        qInfo() << PRINT_INFO(process->readAllStandardOutput());
+        qInfo() << PRINT_INFO(process->readAllStandardOutput().trimmed());
     });
     connect(process, &QProcess::readyReadStandardError, this, [process]{
-        qWarning() << PRINT_INFO(process->readAllStandardError());
+        qWarning() << PRINT_INFO(process->readAllStandardError().trimmed());
     });
     process->start(m_command, m_args);
 
