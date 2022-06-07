@@ -13,6 +13,6 @@ dir=$(find  $repo_path -name "Release" | xargs awk -F '[ :]+' '/Codename/{print 
 for name in $dir
 do
     # ident the cdrom first.
-    echo "deb [trusted=yes] file:/media/cdrom ${name} main" >> /target/etc/apt/sources.list
+    echo "deb [trusted=yes check-date=no] file:/media/cdrom ${name} main" >> /target/etc/apt/sources.list
 done
 fi
