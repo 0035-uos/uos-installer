@@ -3,6 +3,7 @@
 #include <QTextCodec>
 #include <QThread>
 #include <QDebug>
+#include <QTimer>
 
 static QTextCodec* codec_system = QTextCodec::codecForName("System");
 #define PRINT_INFO(x) (codec_system ? codec_system->toUnicode(x) : x)
@@ -36,9 +37,12 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     qInfo() << m_command << m_args << timeout;
     m_quit = false;
     QProcess *process = new QProcess;
+    QTimer *timer = new QTimer;
     process->setEnvironment(QProcess::systemEnvironment());
     connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
-          [process](int, QProcess::ExitStatus){
+          [process, timer](int, QProcess::ExitStatus){
+        timer->stop();
+        timer->deleteLater();
         QByteArray an = process->readAllStandardOutput().trimmed();
         if (!an.isEmpty())
             qInfo() << PRINT_INFO(an);
@@ -47,12 +51,20 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     connect(process, &QProcess::started, this, []{
         qInfo() << "start install";
     });
+#if 0
     connect(process, &QProcess::readyReadStandardOutput, this, [process]{
         qInfo() << PRINT_INFO(process->readAllStandardOutput().trimmed());
     });
     connect(process, &QProcess::readyReadStandardError, this, [process]{
         qWarning() << PRINT_INFO(process->readAllStandardError().trimmed());
     });
+#else
+    connect(timer, &QTimer::timeout, this, [process] {
+        qInfo() << PRINT_INFO(process->readAllStandardOutput().trimmed());
+        qWarning() << PRINT_INFO(process->readAllStandardError().trimmed());
+    });
+    timer->start(2000);
+#endif
     process->start(m_command, m_args);
 
     process->waitForStarted(3000);

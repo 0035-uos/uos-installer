@@ -69,10 +69,7 @@ void PartedConfig::run()
         swapSector = qint64(free_sector*.2);
     }
     swapSpace = correctionSector(swapSpace);
-    {
-        GPartedItem item{"linux-swap", "SWAP", "swap", QString::number(swapSector)};
-        m_data->appendItem(&item);
-    }
+    GPartedItem swapitem{"linux-swap", "SWAP", "swap", QString::number(swapSector)};
     free_sector = free_sector - swapSector;
 
     // 兼容pmon固件
@@ -103,6 +100,8 @@ void PartedConfig::run()
         GPartedItem item{"ext4", "Roota", "/", QString::number(free_sector)};
         m_data->appendItem(&item);
     }
+
+    m_data->appendItem(&swapitem); // swap分区调整到最后
 
     ///  自定义 undo
 
