@@ -8,6 +8,15 @@
 ```
 sudo ./main.sh ~/filesystem.squashfs /dev/sdb
 ```
+## 脚本依赖
+BootLoader相关：
+x86：
+grub-efi-ia32
+x86_64:
+shim-signed grub-efi-amd64-signed efibootmgr
+arm：
+grub-efi-arm
+
 
 ##  目录结构
 脚本代码应该被安装在 `/usr/share/uos-installer/hooks` 目录

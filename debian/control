@@ -33,7 +33,13 @@ Depends: ${shlibs:Depends}, ${misc:Depends},
     libqt5network5,
     libqt5core5a,
     libqt5concurrent5,
-    libqt5xml5
+    libqt5xml5,
+    grub-pc [i386],
+    grub-efi-amd64 [amd64],
+    grub-efi-amd64-bin [amd64],
+    grub-efi-arm64 [arm64],
+    grub-efi-arm64-bin [arm64],
+    efibootmgr
 Description: server for uos-installer
  server for uos-installer
 
