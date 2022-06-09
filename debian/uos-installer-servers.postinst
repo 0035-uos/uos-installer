@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 
-#ln -s /usr/lib/systemd/system/uos-installer-start.service /etc/systemd/system/basic.target.wants
-systemctl enable uos-installer-start.service
+ln -s /usr/lib/systemd/system/uos-installer-start.service /etc/systemd/system/basic.target.wants/uos-installer-start.service
+#systemctl enable uos-installer-start.service
 
