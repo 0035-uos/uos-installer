@@ -7,6 +7,12 @@
 
 static QTextCodec* codec_system = QTextCodec::codecForName("System");
 #define PRINT_INFO(x) (codec_system ? codec_system->toUnicode(x) : x)
+static void print_info(const QByteArray& msg) {
+    QString as = PRINT_INFO(msg);
+    for (const QString& line : as.split(QRegExp("[\r\n\b]"), QString::SkipEmptyParts)) {
+        qInfo() << line;
+    }
+}
 
 GScriptsRunAbstract::GScriptsRunAbstract(QObject *parent) :
     QObject(parent)
@@ -45,7 +51,10 @@ int GScriptsRunAbstract::asyncThread(int timeout)
         timer->deleteLater();
         QByteArray an = process->readAllStandardOutput().trimmed();
         if (!an.isEmpty())
-            qInfo() << PRINT_INFO(an);
+            print_info(an);
+        an = process->readAllStandardError().trimmed();
+                if (!an.isEmpty())
+                    print_info(an);
         process->deleteLater();
     });
     connect(process, &QProcess::started, this, []{
@@ -60,8 +69,8 @@ int GScriptsRunAbstract::asyncThread(int timeout)
     });
 #else
     connect(timer, &QTimer::timeout, this, [process] {
-        qInfo() << PRINT_INFO(process->readAllStandardOutput().trimmed());
-        qWarning() << PRINT_INFO(process->readAllStandardError().trimmed());
+        print_info(process->readAllStandardOutput().trimmed());
+        print_info(process->readAllStandardError().trimmed());
     });
     timer->start(2000);
 #endif
